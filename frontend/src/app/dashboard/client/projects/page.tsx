@@ -107,7 +107,10 @@ export default function ProjectsPage() {
     setPaymentModalOpen(false)
     if (paymentModalMode === "accept_bid") {
       // Update local project status and assigned professional
-      setProjects((prev) => prev.map((p) => (p.id === result.project.id ? result.project : p)))
+      const project = result.data?.project || result.project || result.data || result
+      if (project && project.id) {
+        setProjects((prev) => prev.map((p) => (p.id === project.id ? project : p)))
+      }
       // Update local bids status
       setBids((prev) =>
         prev.map((b) => {
@@ -117,8 +120,10 @@ export default function ProjectsPage() {
       )
     } else {
       // Release payment mode: result has updated project
-      const updatedProj = result.data || result.project || result
-      setProjects((prev) => prev.map((p) => (p.id === updatedProj.id ? updatedProj : p)))
+      const updatedProj = result.data?.project || result.project || result.data || result
+      if (updatedProj && updatedProj.id) {
+        setProjects((prev) => prev.map((p) => (p.id === updatedProj.id ? updatedProj : p)))
+      }
     }
   }
 
