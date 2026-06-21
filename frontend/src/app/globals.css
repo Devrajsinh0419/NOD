@@ -1,0 +1,348 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "tailwindcss";
+@plugin "daisyui";
+
+@tailwind base;
+@custom-variant dark (&:is(.dark *));
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: var(--bg-body, #0D0D0D);
+  color: var(--text-body, #F5F0E8);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.marquee {
+  width: max-content;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --bg-body: #FAF6F0;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F2ECE0;
+  --color-accent: #8B7355;
+  --text-body: #1E1A16;
+  --text-muted: #5A4A35;
+  --text-subtle: #8B7355;
+  --text-ultra-subtle: #B8A88A;
+
+  --background: oklch(0.97 0.005 70);
+  --foreground: oklch(0.18 0.01 70);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.01 70);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.01 70);
+  --primary: oklch(0.55 0.04 70);
+  --primary-foreground: oklch(0.97 0.005 70);
+  --secondary: oklch(0.94 0.01 70);
+  --secondary-foreground: oklch(0.18 0.01 70);
+  --muted: oklch(0.94 0.01 70);
+  --muted-foreground: oklch(0.55 0.04 70);
+  --accent: oklch(0.72 0.1 75);
+  --accent-foreground: oklch(0.18 0.01 70);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.01 70);
+  --input: oklch(0.9 0.01 70);
+  --ring: oklch(0.55 0.04 70);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.94 0.01 70);
+  --sidebar-foreground: oklch(0.18 0.01 70);
+  --sidebar-primary: oklch(0.55 0.04 70);
+  --sidebar-primary-foreground: oklch(0.97 0.005 70);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.9 0.01 70);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --bg-body: #0D0D0D;
+  --bg-card: #1A1714;
+  --bg-hover: #221F1A;
+  --color-accent: #C9A96E;
+  --text-body: #F5F0E8;
+  --text-muted: #8B7355;
+  --text-subtle: #6B5A42;
+  --text-ultra-subtle: #5A4A35;
+
+  --background: oklch(0.13 0.005 60);
+  --foreground: oklch(0.96 0.008 80);
+  --card: oklch(0.18 0.008 55);
+  --card-foreground: oklch(0.96 0.008 80);
+  --popover: oklch(0.18 0.008 55);
+  --popover-foreground: oklch(0.96 0.008 80);
+  --primary: oklch(0.72 0.1 75);
+  --primary-foreground: oklch(0.13 0.005 60);
+  --secondary: oklch(0.22 0.012 55);
+  --secondary-foreground: oklch(0.96 0.008 80);
+  --muted: oklch(0.22 0.012 55);
+  --muted-foreground: oklch(0.58 0.06 65);
+  --accent: oklch(0.72 0.1 75);
+  --accent-foreground: oklch(0.13 0.005 60);
+  --destructive: oklch(0.60 0.16 25);
+  --border: oklch(0.72 0.1 75 / 10%);
+  --input: oklch(0.72 0.1 75 / 12%);
+  --ring: oklch(0.72 0.1 75 / 50%);
+  --chart-1: oklch(0.72 0.1 75);
+  --chart-2: oklch(0.58 0.06 65);
+  --chart-3: oklch(0.48 0.06 60);
+  --chart-4: oklch(0.38 0.04 55);
+  --chart-5: oklch(0.28 0.02 50);
+  --sidebar: oklch(0.15 0.008 55);
+  --sidebar-foreground: oklch(0.96 0.008 80);
+  --sidebar-primary: oklch(0.72 0.1 75);
+  --sidebar-primary-foreground: oklch(0.13 0.005 60);
+  --sidebar-accent: oklch(0.22 0.012 55);
+  --sidebar-accent-foreground: oklch(0.96 0.008 80);
+  --sidebar-border: oklch(0.72 0.1 75 / 8%);
+  --sidebar-ring: oklch(0.72 0.1 75 / 40%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background;
+  }
+
+  html {
+    @apply font-sans;
+  }
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.static-dark {
+  --bg-body: #0D0D0D;
+  --bg-card: #1A1714;
+  --bg-hover: #221F1A;
+  --color-accent: #C9A96E;
+  --text-body: #F5F0E8;
+  --text-muted: #8B7355;
+  --text-subtle: #6B5A42;
+  --text-ultra-subtle: #5A4A35;
+
+  --background: oklch(0.13 0.005 60);
+  --foreground: oklch(0.96 0.008 80);
+  --card: oklch(0.18 0.008 55);
+  --card-foreground: oklch(0.96 0.008 80);
+  --popover: oklch(0.18 0.008 55);
+  --popover-foreground: oklch(0.96 0.008 80);
+  --primary: oklch(0.72 0.1 75);
+  --primary-foreground: oklch(0.13 0.005 60);
+  --secondary: oklch(0.22 0.012 55);
+  --secondary-foreground: oklch(0.96 0.008 80);
+  --muted: oklch(0.22 0.012 55);
+  --muted-foreground: oklch(0.58 0.06 65);
+  --accent: oklch(0.72 0.1 75);
+  --accent-foreground: oklch(0.13 0.005 60);
+  --destructive: oklch(0.60 0.16 25);
+  --border: oklch(0.72 0.1 75 / 10%);
+  --input: oklch(0.72 0.1 75 / 12%);
+  --ring: oklch(0.72 0.1 75 / 50%);
+  --chart-1: oklch(0.72 0.1 75);
+  --chart-2: oklch(0.58 0.06 65);
+  --chart-3: oklch(0.48 0.06 60);
+  --chart-4: oklch(0.38 0.04 55);
+  --chart-5: oklch(0.28 0.02 50);
+  --sidebar: oklch(0.15 0.008 55);
+  --sidebar-foreground: oklch(0.96 0.008 80);
+  --sidebar-primary: oklch(0.72 0.1 75);
+  --sidebar-primary-foreground: oklch(0.13 0.005 60);
+  --sidebar-accent: oklch(0.22 0.012 55);
+  --sidebar-accent-foreground: oklch(0.96 0.008 80);
+  --sidebar-border: oklch(0.72 0.1 75 / 8%);
+  --sidebar-ring: oklch(0.72 0.1 75 / 40%);
+}
+
+/* ── MIDNIGHT BRASS THEME CLASSES OVERRIDES ── */
+.bg-\[\#0D0D0D\] {
+  background-color: var(--bg-body) !important;
+}
+
+.bg-\[\#1A1714\] {
+  background-color: var(--bg-card) !important;
+}
+
+.bg-\[\#221F1A\] {
+  background-color: var(--bg-hover) !important;
+}
+
+.bg-\[\#0B0B09\] {
+  background-color: var(--bg-card) !important;
+  /* Sidebar specific */
+}
+
+.bg-\[\#111111\] {
+  background-color: var(--bg-body) !important;
+}
+
+.text-\[\#F5F0E8\] {
+  color: var(--text-body) !important;
+}
+
+.text-\[\#8B7355\] {
+  color: var(--text-muted) !important;
+}
+
+.text-\[\#6B5A42\] {
+  color: var(--text-subtle) !important;
+}
+
+.text-\[\#5A4A35\] {
+  color: var(--text-ultra-subtle) !important;
+}
+
+.text-\[\#C9A96E\] {
+  color: var(--color-accent) !important;
+}
+
+.bg-\[\#C9A96E\] {
+  background-color: var(--color-accent) !important;
+}
+
+.border-\[\#C9A96E\] {
+  border-color: var(--color-accent) !important;
+}
+
+.border-\[\#C9A96E\]\/8 {
+  border-color: color-mix(in srgb, var(--color-accent) 8%, transparent) !important;
+}
+
+.border-\[\#C9A96E\]\/10 {
+  border-color: color-mix(in srgb, var(--color-accent) 10%, transparent) !important;
+}
+
+.border-\[\#C9A96E\]\/12 {
+  border-color: color-mix(in srgb, var(--color-accent) 12%, transparent) !important;
+}
+
+.border-\[\#C9A96E\]\/15 {
+  border-color: color-mix(in srgb, var(--color-accent) 15%, transparent) !important;
+}
+
+.border-\[\#C9A96E\]\/20 {
+  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent) !important;
+}
+
+.border-\[\#C9A96E\]\/25 {
+  border-color: color-mix(in srgb, var(--color-accent) 25%, transparent) !important;
+}
+
+.border-\[\#C9A96E\]\/30 {
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent) !important;
+}
+
+.border-\[\#C9A96E\]\/6 {
+  border-color: color-mix(in srgb, var(--color-accent) 6%, transparent) !important;
+}
+
+.bg-\[\#C9A96E\]\/5 {
+  background-color: color-mix(in srgb, var(--color-accent) 5%, transparent) !important;
+}
+
+.bg-\[\#C9A96E\]\/8 {
+  background-color: color-mix(in srgb, var(--color-accent) 8%, transparent) !important;
+}
+
+.bg-\[\#C9A96E\]\/3 {
+  background-color: color-mix(in srgb, var(--color-accent) 3%, transparent) !important;
+}
+
+.bg-\[\#C9A96E\]\/4 {
+  background-color: color-mix(in srgb, var(--color-accent) 4%, transparent) !important;
+}
+
+.bg-\[\#C9A96E\]\/12 {
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent) !important;
+}
+
+.bg-\[\#C9A96E\]\/15 {
+  background-color: color-mix(in srgb, var(--color-accent) 15%, transparent) !important;
+}
+
+.hover\:bg-\[\#C9A96E\]\/8:hover {
+  background-color: color-mix(in srgb, var(--color-accent) 8%, transparent) !important;
+}
+
+.hover\:bg-\[\#C9A96E\]\/12:hover {
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent) !important;
+}
+
+.hover\:bg-\[\#C9A96E\]\/15:hover {
+  background-color: color-mix(in srgb, var(--color-accent) 15%, transparent) !important;
+}
+
+.hover\:border-\[\#C9A96E\]\/18:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 18%, transparent) !important;
+}
+
+.hover\:border-\[\#C9A96E\]\/15:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 15%, transparent) !important;
+}
