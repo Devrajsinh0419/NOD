@@ -620,7 +620,7 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
           {/* Note */}
           <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 flex items-start gap-3">
             <span className="text-amber-400/60 text-sm mt-0.5">📌</span>
-            <p className="text-xs text-amber-400/50 leading-relaxed">
+            <p className="text-xs text-black/80 leading-relaxed">
               Keep Note in the photograph and documents for better understanding
             </p>
           </div>

@@ -9,7 +9,8 @@ import {
   UserX, 
   UserCheck, 
   RefreshCw, 
-  Search
+  Search,
+  Users
 } from "lucide-react"
 
 interface BlockedMessage {
@@ -33,13 +34,25 @@ interface WarningLog {
   created_at: string
 }
 
+interface User {
+  id: number
+  username: string
+  email: string
+  full_name: string
+  role: string
+  verification_status: string
+  date_joined: string
+}
+
 export default function AdminModerationPage() {
   const [blockedMessages, setBlockedMessages] = useState<BlockedMessage[]>([])
   const [warnings, setWarnings] = useState<WarningLog[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeTab, setActiveTab] = useState<"blocked" | "warnings">("blocked")
+  const [activeTab, setActiveTab] = useState<"blocked" | "warnings" | "users">("blocked")
   const [actioningUserId, setActioningUserId] = useState<number | null>(null)
+  const [deletingUserId, setDeletingUserId] = useState<number | null>(null)
 
   useEffect(() => {
     fetchLogs()
@@ -48,9 +61,10 @@ export default function AdminModerationPage() {
   const fetchLogs = async () => {
     setLoading(true)
     try {
-      const [blockedRes, warningsRes] = await Promise.all([
+      const [blockedRes, warningsRes, usersRes] = await Promise.all([
         apiFetch<{ success: boolean; data: BlockedMessage[] }>("/api/admin/moderation/blocked"),
-        apiFetch<{ success: boolean; data: WarningLog[] }>("/api/admin/moderation/warnings")
+        apiFetch<{ success: boolean; data: WarningLog[] }>("/api/admin/moderation/warnings"),
+        apiFetch<{ success: boolean; data: User[] }>("/api/admin/users")
       ])
       
       if (blockedRes.success) {
@@ -59,10 +73,31 @@ export default function AdminModerationPage() {
       if (warningsRes.success) {
         setWarnings(warningsRes.data || [])
       }
+      if (usersRes.success) {
+        setUsers(usersRes.data || [])
+      }
     } catch (err) {
-      console.error("Failed to fetch admin logs:", err)
+      console.error("Failed to fetch admin logs/users:", err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteUser = async (userId: number, username: string) => {
+    if (!confirm(`Are you absolutely sure you want to delete user "${username}" (ID: ${userId})? This action cannot be undone.`)) {
+      return
+    }
+    setDeletingUserId(userId)
+    try {
+      const res = await apiFetch<{ success: boolean; message: string }>(`/api/admin/users/${userId}`, {
+        method: "DELETE"
+      })
+      alert(res.message || "User deleted successfully.")
+      await fetchLogs()
+    } catch (err) {
+      alert("Failed to delete user: " + (err instanceof Error ? err.message : String(err)))
+    } finally {
+      setDeletingUserId(null)
     }
   }
 
@@ -110,10 +145,21 @@ export default function AdminModerationPage() {
     )
   })
 
+  const filteredUsers = users.filter((u) => {
+    const query = searchQuery.toLowerCase()
+    return (
+      u.username.toLowerCase().includes(query) ||
+      u.email.toLowerCase().includes(query) ||
+      u.full_name.toLowerCase().includes(query) ||
+      u.role.toLowerCase().includes(query)
+    )
+  })
+
   // Basic stats
   const totalBlocked = blockedMessages.length
   const totalWarnings = warnings.length
   const restrictedUsers = warnings.filter((w) => w.warning_count >= 3).length
+  const totalUsers = users.length
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-0 py-6 space-y-6">
@@ -143,7 +189,7 @@ export default function AdminModerationPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
         <div className="p-5 rounded-2xl border border-[#C9A96E]/20 bg-[#111111] space-y-2">
           <div className="flex justify-between items-center text-[#8B7355]">
             <span className="text-[10px] font-bold uppercase tracking-wider">Blocked Messages</span>
@@ -159,7 +205,7 @@ export default function AdminModerationPage() {
             <AlertTriangle className="w-4 h-4 text-amber-500" />
           </div>
           <p className="text-3xl font-light text-[#F5F0E8] font-mono leading-none">{totalWarnings}</p>
-          <p className="text-[9px] text-[#6B5A42]">Active warning counts across project discussion channels.</p>
+          <p className="text-[9px] text-[#6B5A42]">Active warning strikes across project discussions.</p>
         </div>
 
         <div className="p-5 rounded-2xl border border-red-500/20 bg-[#111111] space-y-2">
@@ -168,7 +214,16 @@ export default function AdminModerationPage() {
             <UserX className="w-4 h-4 text-red-500" />
           </div>
           <p className="text-3xl font-light text-red-500 font-mono leading-none">{restrictedUsers}</p>
-          <p className="text-[9px] text-[#6B5A42]">Users with 3 strikes locked out from project chat/meetings.</p>
+          <p className="text-[9px] text-[#6B5A42]">Users locked out from project chat/meetings.</p>
+        </div>
+
+        <div className="p-5 rounded-2xl border border-[#C9A96E]/20 bg-[#111111] space-y-2">
+          <div className="flex justify-between items-center text-[#8B7355]">
+            <span className="text-[10px] font-bold uppercase tracking-wider">Total Users</span>
+            <Users className="w-4 h-4 text-[#C9A96E]" />
+          </div>
+          <p className="text-3xl font-light text-[#F5F0E8] font-mono leading-none">{totalUsers}</p>
+          <p className="text-[9px] text-[#6B5A42]">Total registered client and professional accounts.</p>
         </div>
       </div>
 
@@ -194,6 +249,16 @@ export default function AdminModerationPage() {
             }`}
           >
             Warning logs ({filteredWarnings.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("users")}
+            className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+              activeTab === "users"
+                ? "bg-[#C9A96E] text-[#0D0D0D] font-bold"
+                : "text-[#8B7355] hover:text-[#C9A96E]/80 hover:bg-white/2"
+            }`}
+          >
+            All Users ({filteredUsers.length})
           </button>
         </div>
 
@@ -278,7 +343,7 @@ export default function AdminModerationPage() {
               </table>
             </div>
           )
-        ) : (
+        ) : activeTab === "warnings" ? (
           filteredWarnings.length === 0 ? (
             <p className="text-xs text-[#8B7355] italic text-center py-16">No active warning logs found matching criteria.</p>
           ) : (
@@ -353,6 +418,65 @@ export default function AdminModerationPage() {
                       </tr>
                     )
                   })}
+                </tbody>
+              </table>
+            </div>
+          )
+        ) : (
+          filteredUsers.length === 0 ? (
+            <p className="text-xs text-[#8B7355] italic text-center py-16">No users found matching criteria.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-[#C9A96E]/6 text-[#8B7355] uppercase tracking-wider font-semibold text-[9px] bg-white/2">
+                    <th className="p-4">User Details</th>
+                    <th className="p-4">Email</th>
+                    <th className="p-4">Role</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Joined Date</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#C9A96E]/6">
+                  {filteredUsers.map((u) => (
+                    <tr key={u.id} className="hover:bg-white/2 transition-colors">
+                      <td className="p-4 font-semibold text-[#F5F0E8]">
+                        {u.full_name}
+                        <span className="block text-[9px] text-[#6B5A42] font-mono mt-0.5">Username: {u.username} | ID: {u.id}</span>
+                      </td>
+                      <td className="p-4 text-[#8B7355] font-mono">{u.email}</td>
+                      <td className="p-4">
+                        <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/5 border border-[#C9A96E]/12 text-[#C9A96E]">
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                          u.verification_status === "banned"
+                            ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                            : u.verification_status === "verified"
+                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                            : "bg-[#C9A96E]/10 text-[#C9A96E] border border-[#C9A96E]/20"
+                        }`}>
+                          {u.verification_status || "Pending"}
+                        </span>
+                      </td>
+                      <td className="p-4 text-[#6B5A42] font-mono text-[10px]">
+                        {u.date_joined ? new Date(u.date_joined).toLocaleDateString() : "N/A"}
+                      </td>
+                      <td className="p-4 text-right whitespace-nowrap">
+                        <button
+                          onClick={() => handleDeleteUser(u.id, u.username)}
+                          disabled={deletingUserId !== null || u.role === "admin"}
+                          className="px-2.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-black border border-red-500/20 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <UserX className="w-3 h-3" />
+                          Delete User
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

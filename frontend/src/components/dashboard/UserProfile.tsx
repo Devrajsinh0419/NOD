@@ -295,7 +295,7 @@ export default function UserProfile({ role }: Props) {
                       <img src={getMediaUrl(prof.profile_photo) || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80`} alt={prof.full_name} className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <h5 className="text-xs font-semibold text-black">{prof.full_name}</h5>
+                      <h5 className="text-xs font-semibold text-[#F5F0E8]">{prof.full_name}</h5>
                       <p className="text-[10px] text-[#6B5A42]">{prof.role}</p>
                     </div>
                   </div>
@@ -323,19 +323,19 @@ export default function UserProfile({ role }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-xs">
             <div className="flex justify-between md:justify-start gap-4">
               <span className="text-[#6B5A42] w-24">Email :</span>
-              <span className="text-black/60">{user.email}</span>
+              <span className="text-white/60">{user.email}</span>
             </div>
             <div className="flex justify-between md:justify-start gap-4">
               <span className="text-[#6B5A42] w-24">Phone No :</span>
-              <span className="text-black/60">{details.contact_phone || "Not provided"}</span>
+              <span className="text-white/60">{details.contact_phone || "Not provided"}</span>
             </div>
             <div className="flex justify-between md:justify-start gap-4">
               <span className="text-[#6B5A42] w-24">Location :</span>
-              <span className="text-black/60">{details.address || "Not provided"}</span>
+              <span className="text-white/60">{details.address || "Not provided"}</span>
             </div>
             <div className="flex justify-between md:justify-start gap-4">
               <span className="text-[#6B5A42] w-24">Member Since :</span>
-              <span className="text-black/60">{formattedDate}</span>
+              <span className="text-white/60">{formattedDate}</span>
             </div>
           </div>
         </div>
@@ -401,7 +401,7 @@ export default function UserProfile({ role }: Props) {
               >
                 {formatDisplayName(details.full_name, user.first_name, user.last_name, user.username)}
               </h2>
-              <p className="text-xs text-black/80">
+              <p className="text-xs text-white/60">
                 {defaultRoleTitle} {details.specialization ? `• ${details.specialization.split(",")[0]}` : ""}
               </p>
             </div>
@@ -420,7 +420,7 @@ export default function UserProfile({ role }: Props) {
               <p className="text-[9px] uppercase tracking-wider text-[#6B5A42]">Projects</p>
             </div>
             <div>
-              <p className="text-lg font-light text-[#F5F0E8] font-mono">{stats.average_rating ? stats.average_rating.toFixed(1) : "5.0"}</p>
+              <p className="text-lg font-light text-[#F5F0E8] font-mono">{(stats.average_rating || 0).toFixed(1)}</p>
               <p className="text-[9px] uppercase tracking-wider text-[#6B5A42]">Rating</p>
             </div>
             <div>

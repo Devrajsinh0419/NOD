@@ -11,6 +11,9 @@ const STATUS_CONFIG: Record<ProjectStatus, { label: string; bg: string; text: st
   ADVANCE_PAID:             { label: "Advance Paid",             bg: "bg-violet-500/10",      text: "text-violet-400/70", dot: "bg-violet-400/60" },
   ESCROW_ACTIVE:            { label: "Escrow Active",            bg: "bg-emerald-500/10",     text: "text-emerald-400/70", dot: "bg-emerald-400/60" },
   AWAITING_CLIENT_APPROVAL: { label: "Awaiting Client Approval", bg: "bg-purple-500/10",      text: "text-purple-400/70", dot: "bg-purple-400/60" },
+  FINAL_PAYMENT_PENDING:    { label: "Final Payment Pending",    bg: "bg-pink-500/10",        text: "text-pink-400/70",   dot: "bg-pink-400/60" },
+  FINAL_PAYMENT_RECEIVED:   { label: "Final Payment Received",   bg: "bg-teal-500/10",        text: "text-teal-400/70",   dot: "bg-teal-400/60" },
+  RELEASED:                 { label: "Released",                 bg: "bg-cyan-500/10",        text: "text-cyan-400/70",   dot: "bg-cyan-400/60" },
 }
 
 export default function StatusBadge({ status }: { status: ProjectStatus }) {

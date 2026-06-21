@@ -11,6 +11,9 @@ export type ProjectStatus =
   | "ADVANCE_PAID"
   | "ESCROW_ACTIVE"
   | "AWAITING_CLIENT_APPROVAL"
+  | "FINAL_PAYMENT_PENDING"
+  | "FINAL_PAYMENT_RECEIVED"
+  | "RELEASED"
 
 export type ProfessionalRole =
   | "architect"

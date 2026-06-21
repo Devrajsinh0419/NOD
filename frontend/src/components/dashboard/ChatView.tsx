@@ -6,17 +6,17 @@ import type { ChatRoom, ChatMessage } from "@/types/chat.types"
 import { getMediaUrl } from "@/lib/api"
 import { projectService } from "@/services/project.service"
 import EscrowPaymentModal from "@/components/dashboard/EscrowPaymentModal"
-import { 
-  MessageSquare, 
-  Video, 
-  FileText, 
-  Paperclip, 
-  Download, 
-  AlertTriangle, 
-  Plus, 
-  Play, 
-  Square, 
-  Loader2 
+import {
+  MessageSquare,
+  Video,
+  FileText,
+  Paperclip,
+  Download,
+  AlertTriangle,
+  Plus,
+  Play,
+  Square,
+  Loader2
 } from "lucide-react"
 
 interface Props {
@@ -43,11 +43,11 @@ export default function ChatView({ role }: Props) {
   const [loadingMeetings, setLoadingMeetings] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [sendingFile, setSendingFile] = useState(false)
-  
+
   // Escrow payment modal state
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
   const [requestingCompletion, setRequestingCompletion] = useState(false)
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -95,7 +95,7 @@ export default function ChatView({ role }: Props) {
     const senderId = msg.sender_id || msg.sender?.id
     const senderName = msg.sender_name || msg.sender?.full_name || "System"
     const isOther = senderId === room.other_user?.id
-    
+
     return {
       id: msg.id,
       content: msg.content || msg.message,
@@ -115,7 +115,7 @@ export default function ChatView({ role }: Props) {
 
   async function loadRoomData(room: ChatRoom | null, shouldScroll = false) {
     if (!room) return
-    
+
     // 1. Fetch Warnings
     if (room.project) {
       try {
@@ -190,7 +190,7 @@ export default function ChatView({ role }: Props) {
 
     const content = newMessage
     const file = selectedFile
-    
+
     setNewMessage("") // Clear input instantly
     setSelectedFile(null)
 
@@ -204,21 +204,21 @@ export default function ChatView({ role }: Props) {
         const rawMsg = await chatService.sendMessage(activeRoom.id, content)
         sentMsg = normalizeMsg(rawMsg, activeRoom)
       }
-      
+
       setMessages((prev) => [...prev, sentMsg])
       setTimeout(scrollToBottom, 50)
-      
+
       // Update last message in the sidebar room item
       setRooms((prevRooms) =>
         prevRooms.map((r) =>
           r.id === activeRoom.id
             ? {
-                ...r,
-                last_message: {
-                  content: sentMsg.content,
-                  created_at: sentMsg.created_at,
-                },
-              }
+              ...r,
+              last_message: {
+                content: sentMsg.content,
+                created_at: sentMsg.created_at,
+              },
+            }
             : r
         )
       )
@@ -317,7 +317,7 @@ export default function ChatView({ role }: Props) {
       setRequestingCompletion(true)
       const res = await projectService.requestProjectCompletion(activeRoom.project.id)
       alert(res.message || "Project completion requested. Client has been notified to make final payment.")
-      
+
       // Update room local status
       const updatedProj = { ...activeRoom.project, status: "AWAITING_CLIENT_APPROVAL" } as any
       setActiveRoom({ ...activeRoom, project: updatedProj })
@@ -351,7 +351,7 @@ export default function ChatView({ role }: Props) {
   return (
     <div className="max-w-7xl mx-auto h-[calc(100vh-140px)] flex flex-col px-4 md:px-0">
       <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-3 rounded-3xl border border-[#C9A96E]/60 bg-[#1A1714] overflow-hidden">
-        
+
         {/* Left Column: Room List */}
         <div className="border-r border-[#C9A96E]/12 flex flex-col h-full bg-[#111111]">
           {/* Header */}
@@ -359,7 +359,7 @@ export default function ChatView({ role }: Props) {
             <h3 className="text-lg font-light text-[#F5F0E8] tracking-wide font-serif" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               Project Chats
             </h3>
-            
+
             {/* Search */}
             <div className="relative">
               <input
@@ -388,11 +388,10 @@ export default function ChatView({ role }: Props) {
                   <button
                     key={room.id}
                     onClick={() => setActiveRoom(room)}
-                    className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-3 ${
-                      isActive
-                        ? "bg-[#C9A96E] text-[#0D0D0D] border-white font-bold"
-                        : "bg-[#C9A96E]/3 text-black border-[#C9A96E]/6 hover:bg-[#C9A96E]/5 hover:border-[#C9A96E]/15"
-                    }`}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center gap-3 ${isActive
+                      ? "bg-[#C9A96E] text-[#0D0D0D] border-white font-bold"
+                      : "bg-[#C9A96E]/3 text-black border-[#C9A96E]/6 hover:bg-[#C9A96E]/5 hover:border-[#C9A96E]/15"
+                      }`}
                   >
                     <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-white/10 flex items-center justify-center border border-[#C9A96E]/20">
                       {room.other_user?.profile_photo ? (
@@ -423,24 +422,6 @@ export default function ChatView({ role }: Props) {
               })
             )}
           </div>
-
-          {/* Client Progress Tracker Bar (if active room has project) */}
-          {role === "client" && activeRoom?.project && (
-            <div className="p-5 border-t border-[#C9A96E]/6 bg-white/2 space-y-2">
-              <div className="flex justify-between text-[10px] text-[#6B5A42] uppercase tracking-wider font-semibold">
-                <span>completion till now</span>
-                <span className="text-[#8B7355] font-mono">
-                  {activeRoom.project.status === "completed" ? "100%" : "75%"}
-                </span>
-              </div>
-              <div className="w-full h-1 bg-[#C9A96E]/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-white transition-all duration-500"
-                  style={{ width: activeRoom.project.status === "completed" ? "100%" : "75%" }}
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Right Column: Chat/Discussion Window */}
@@ -479,13 +460,12 @@ export default function ChatView({ role }: Props) {
                 <div className="flex items-center gap-2 shrink-0">
                   {/* Warnings Strike Counter Badge */}
                   {activeRoom.project && (
-                    <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[9px] font-bold uppercase tracking-wider ${
-                      warningsCount >= 3 
-                        ? "border-red-500/20 bg-red-500/5 text-red-500" 
-                        : warningsCount > 0 
-                          ? "border-amber-500/20 bg-amber-500/5 text-amber-500 animate-pulse" 
-                          : "border-[#C9A96E]/20 bg-[#C9A96E]/5 text-[#C9A96E]"
-                    }`}>
+                    <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[9px] font-bold uppercase tracking-wider ${warningsCount >= 3
+                      ? "border-red-500/20 bg-red-500/5 text-red-500"
+                      : warningsCount > 0
+                        ? "border-amber-500/20 bg-amber-500/5 text-amber-500 animate-pulse"
+                        : "border-[#C9A96E]/20 bg-[#C9A96E]/5 text-[#C9A96E]"
+                      }`}>
                       <AlertTriangle className="w-3 h-3" />
                       <span>Strikes: {warningsCount}/3</span>
                     </div>
@@ -535,33 +515,30 @@ export default function ChatView({ role }: Props) {
               <div className="flex border-b border-[#C9A96E]/12 bg-[#111111] px-5 py-2.5 shrink-0 gap-6">
                 <button
                   onClick={() => setActiveTab("chat")}
-                  className={`pb-1 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 border-b-2 ${
-                    activeTab === "chat"
-                      ? "text-[#C9A96E] border-[#C9A96E]"
-                      : "text-[#8B7355] border-transparent hover:text-[#C9A96E]/80"
-                  }`}
+                  className={`pb-1 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 border-b-2 ${activeTab === "chat"
+                    ? "text-[#C9A96E] border-[#C9A96E]"
+                    : "text-[#8B7355] border-transparent hover:text-[#C9A96E]/80"
+                    }`}
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   Chat
                 </button>
                 <button
                   onClick={() => setActiveTab("meetings")}
-                  className={`pb-1 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 border-b-2 ${
-                    activeTab === "meetings"
-                      ? "text-[#C9A96E] border-[#C9A96E]"
-                      : "text-[#8B7355] border-transparent hover:text-[#C9A96E]/80"
-                  }`}
+                  className={`pb-1 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 border-b-2 ${activeTab === "meetings"
+                    ? "text-[#C9A96E] border-[#C9A96E]"
+                    : "text-[#8B7355] border-transparent hover:text-[#C9A96E]/80"
+                    }`}
                 >
                   <Video className="w-3.5 h-3.5" />
                   Meetings
                 </button>
                 <button
                   onClick={() => setActiveTab("files")}
-                  className={`pb-1 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 border-b-2 ${
-                    activeTab === "files"
-                      ? "text-[#C9A96E] border-[#C9A96E]"
-                      : "text-[#8B7355] border-transparent hover:text-[#C9A96E]/80"
-                  }`}
+                  className={`pb-1 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 border-b-2 ${activeTab === "files"
+                    ? "text-[#C9A96E] border-[#C9A96E]"
+                    : "text-[#8B7355] border-transparent hover:text-[#C9A96E]/80"
+                    }`}
                 >
                   <FileText className="w-3.5 h-3.5" />
                   Shared Files ({sharedFiles.length})
@@ -599,14 +576,13 @@ export default function ChatView({ role }: Props) {
 
                             {/* Bubble */}
                             <div
-                              className={`rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${
-                                isMe
-                                  ? "bg-[#1A1714] text-[#F5F0E8] border border-[#C9A96E]/12 rounded-tr-none"
-                                  : "bg-[#C9A96E] text-[#0D0D0D] rounded-tl-none"
-                              } ${msg.is_flagged ? "border-red-500/50 text-red-400 bg-red-950/20" : ""}`}
+                              className={`rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${isMe
+                                ? "bg-[#1A1714] text-[#F5F0E8] border border-[#C9A96E]/12 rounded-tr-none"
+                                : "bg-[#C9A96E] text-[#0D0D0D] rounded-tl-none"
+                                } ${msg.is_flagged ? "border-red-500/50 text-red-400 bg-red-950/20" : ""}`}
                             >
                               {msg.content}
-                              
+
                               {/* Attachment layout inside message bubble */}
                               {msg.attachment && (
                                 <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between gap-3 bg-black/10 rounded-lg p-2">
@@ -614,9 +590,9 @@ export default function ChatView({ role }: Props) {
                                     <FileText className="w-4 h-4 shrink-0" />
                                     <span className="truncate text-[10px]">Open Attachment</span>
                                   </div>
-                                  <a 
-                                    href={getMediaUrl(msg.attachment)} 
-                                    target="_blank" 
+                                  <a
+                                    href={getMediaUrl(msg.attachment)}
+                                    target="_blank"
                                     rel="noreferrer"
                                     className="p-1 rounded bg-white/10 hover:bg-white/20 transition-all shrink-0 text-inherit"
                                   >
@@ -649,9 +625,9 @@ export default function ChatView({ role }: Props) {
                               <Paperclip className="w-3.5 h-3.5 text-black shrink-0" />
                               <span className="truncate font-semibold">{selectedFile.name} ({(selectedFile.size / 1024).toFixed(0)} KB)</span>
                             </div>
-                            <button 
-                              type="button" 
-                              onClick={() => setSelectedFile(null)} 
+                            <button
+                              type="button"
+                              onClick={() => setSelectedFile(null)}
                               className="text-black font-bold ml-2 cursor-pointer hover:scale-110"
                             >
                               ✕
@@ -675,15 +651,15 @@ export default function ChatView({ role }: Props) {
                         />
                         <div className="flex justify-between items-center pt-2 border-t border-[#C9A96E]/20">
                           <div className="flex gap-3 text-[#8B7355]">
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               onClick={handleFileClick}
                               className="hover:text-black transition-colors text-sm cursor-pointer"
                               title="Attach PDF, PNG, JPG, JPEG, DOCX"
                             >
                               <Paperclip className="w-4 h-4" />
                             </button>
-                            <input 
+                            <input
                               type="file"
                               ref={fileInputRef}
                               onChange={handleFileChange}
@@ -691,7 +667,7 @@ export default function ChatView({ role }: Props) {
                               className="hidden"
                             />
                           </div>
-                          
+
                           <button
                             type="submit"
                             disabled={(!newMessage.trim() && !selectedFile) || sendingFile}
@@ -743,22 +719,21 @@ export default function ChatView({ role }: Props) {
                       {meetings.map((meet) => {
                         const isCompleted = meet.status === "COMPLETED"
                         const isActive = meet.status === "ACTIVE"
-                        
+
                         return (
-                          <div 
-                            key={meet.id} 
+                          <div
+                            key={meet.id}
                             className="p-4 border border-[#C9A96E]/12 rounded-2xl bg-[#111111] flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-[#C9A96E]/20 transition-all"
                           >
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-bold text-[#F5F0E8]">Meeting #{meet.id}</span>
-                                <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${
-                                  isCompleted 
-                                    ? "bg-white/5 text-[#8B7355]" 
-                                    : isActive 
-                                      ? "bg-emerald-500/10 text-emerald-400 animate-pulse border border-emerald-500/20" 
-                                      : "bg-blue-500/10 text-blue-400"
-                                }`}>
+                                <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${isCompleted
+                                  ? "bg-white/5 text-[#8B7355]"
+                                  : isActive
+                                    ? "bg-emerald-500/10 text-emerald-400 animate-pulse border border-emerald-500/20"
+                                    : "bg-blue-500/10 text-blue-400"
+                                  }`}>
                                   {meet.status}
                                 </span>
                               </div>
@@ -820,13 +795,13 @@ export default function ChatView({ role }: Props) {
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {sharedFiles.map((msg) => {
-                        const filename = msg.attachment 
+                        const filename = msg.attachment
                           ? msg.attachment.substring(msg.attachment.lastIndexOf("/") + 1)
                           : "Attachment"
-                        
+
                         return (
-                          <div 
-                            key={msg.id} 
+                          <div
+                            key={msg.id}
                             className="p-4 border border-[#C9A96E]/12 rounded-2xl bg-[#111111] hover:border-[#C9A96E]/20 transition-all flex items-start justify-between gap-3 min-w-0"
                           >
                             <div className="min-w-0 space-y-1">
@@ -841,7 +816,7 @@ export default function ChatView({ role }: Props) {
                                 Date: {new Date(msg.created_at).toLocaleDateString()}
                               </p>
                             </div>
-                            
+
                             {msg.attachment && (
                               <a
                                 href={getMediaUrl(msg.attachment)}
