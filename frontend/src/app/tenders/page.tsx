@@ -18,7 +18,8 @@ import {
   ChevronRight,
   AlertCircle,
   Copy,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from "lucide-react";
 import { Tender, TenderStats } from "@/types/tender.types";
 import { authService } from "@/services/auth.service";
@@ -36,6 +37,12 @@ export default function TendersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; bidNumber: string } | null>(null);
+
+  // Lock and Premium Payment States
+  const [unlocked, setUnlocked] = useState(false);
+  const [checkingUnlock, setCheckingUnlock] = useState(true);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   // Filter States
   const [activeTab, setActiveTab] = useState<"all" | "relevant">("all");
@@ -116,7 +123,15 @@ export default function TendersPage() {
   };
 
   useEffect(() => {
-    fetchStats();
+    if (typeof window !== "undefined") {
+      const isUnlocked = localStorage.getItem("tenders_unlocked") === "true";
+      setUnlocked(isUnlocked);
+      if (isUnlocked) {
+        fetchStats();
+      }
+    }
+    setCheckingUnlock(false);
+
     const storedUser = authService.getStoredUser();
     if (storedUser && storedUser.role) {
       setRole(storedUser.role.toLowerCase());
@@ -124,8 +139,10 @@ export default function TendersPage() {
   }, []);
 
   useEffect(() => {
-    fetchTenders();
-  }, [page, activeTab, search, ministry, department]);
+    if (unlocked) {
+      fetchTenders();
+    }
+  }, [unlocked, page, activeTab, search, ministry, department]);
 
   const handleTabChange = (tab: "all" | "relevant") => {
     setActiveTab(tab);
@@ -192,6 +209,175 @@ export default function TendersPage() {
     }
   };
 
+  if (checkingUnlock) {
+    return (
+      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#C9A96E]"></div>
+      </div>
+    );
+  }
+
+  if (!unlocked) {
+    return (
+      <div className="min-h-screen bg-[#0D0D0D] text-[#F5F0E8] font-sans pb-20">
+        {/* Navbar / Header */}
+        <header className="border-b border-[#C9A96E]/10 bg-black/40 backdrop-blur-md sticky top-0 z-40">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+            <Link href={`/dashboard/${role}`} className="flex items-center gap-1">
+              <Image src={logo} alt="Logo" className="h-15 w-15" />
+              <p className="text-6xl font-bold text-white">N</p>
+              <div className="leading-none">
+                <p className="text-3xl font-bold text-white">OD</p>
+                <p className="text-[14px]  text-white">IGHT OWL DESIGNERS</p>
+              </div>
+            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-sm text-white hover:text-black transition-colors">
+                Home
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* Lock Screen main content */}
+        <main className="mx-auto max-w-4xl px-6 mt-16 text-center">
+          <div className="max-w-2xl mx-auto bg-[#1A1714] border border-[#C9A96E]/30 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+            {/* Ambient gold glow */}
+            <div className="absolute -top-24 -left-24 h-48 w-48 bg-[#C9A96E]/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-24 -right-24 h-48 w-48 bg-[#C9A96E]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="flex justify-center mb-6 relative">
+              <div className="p-5 bg-[#C9A96E]/10 rounded-full border border-[#C9A96E]/20 text-[#C9A96E] animate-pulse">
+                <Lock className="h-10 w-10" />
+              </div>
+              <div className="absolute top-0 right-1/2 translate-x-12 -translate-y-1 bg-[#C9A96E] text-[#0D0D0D] text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full font-bold">
+                Premium
+              </div>
+            </div>
+
+            <h1 className="text-3xl md:text-4xl font-serif font-light text-[#F5F0E8] tracking-wide mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Live Tanders Discovery Pipeline
+            </h1>
+            
+            <p className="text-sm text-[#8B7355] leading-relaxed max-w-lg mx-auto mb-8">
+              Unlock real-time engineering, custom fabrication, and architectural government contracts sourced live from Government e-Marketplace India. Get a competitive edge with keyword filters and sync alerts.
+            </p>
+
+            {/* Features list */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto text-left mb-8 border-t border-b border-[#C9A96E]/10 py-6">
+              <div className="flex items-center gap-2.5 text-xs text-[#F5F0E8]/90">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]"></span>
+                <span>Live Government Contract Sync</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-xs text-[#F5F0E8]/90">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]"></span>
+                <span>CNC & Fabrication Matcher</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-xs text-[#F5F0E8]/90">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]"></span>
+                <span>Keyword & Category Filtering</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-xs text-[#F5F0E8]/90">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]"></span>
+                <span>Copy & Deep Link to Portal</span>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="text-center">
+                <span className="text-xs text-[#8B7355] uppercase tracking-wider block">One-Time Activation</span>
+                <span className="text-4xl font-light text-white font-serif">₹499</span>
+              </div>
+
+              <button
+                onClick={() => setPaymentModalOpen(true)}
+                className="w-full max-w-sm py-4 rounded-full bg-[#C9A96E] hover:bg-[#B8944F] text-[#0D0D0D] font-bold uppercase tracking-widest text-xs transition-all shadow-lg hover:shadow-[#C9A96E]/10"
+              >
+                Unlock Access Now
+              </button>
+              
+              <p className="text-[10px] text-[#6B5A42]">
+                Secure payment simulation. No actual credit card details required.
+              </p>
+            </div>
+          </div>
+        </main>
+
+        {/* Dummy Payment Modal */}
+        {paymentModalOpen && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-md rounded-3xl border border-[#C9A96E]/30 bg-[#111111] p-6 space-y-6 shadow-2xl text-[#F5F0E8]">
+              <div className="text-center space-y-1">
+                <h3 className="text-2xl font-light font-serif text-[#C9A96E]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  Secure Payment Gateway
+                </h3>
+                <p className="text-[10px] text-[#8B7355] tracking-wider uppercase font-semibold">
+                  Tanders Pipeline Unlock
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl border border-[#C9A96E]/15 bg-[#1B1917]/50 space-y-4">
+                <div className="flex justify-between text-xs text-[#8B7355]">
+                  <span>Premium Feature Activation</span>
+                  <span className="font-semibold text-white">₹499.00</span>
+                </div>
+                <div className="flex justify-between text-xs text-[#8B7355]">
+                  <span>Platform Fees</span>
+                  <span className="text-emerald-500 font-semibold">FREE</span>
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-[#C9A96E]/20">
+                  <span className="text-xs uppercase tracking-wider font-bold text-[#C9A96E]">Total Payable</span>
+                  <span className="text-2xl font-light text-white font-serif">₹499.00</span>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl border border-emerald-500/15 bg-emerald-500/5 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400">Sandbox/Test Mode</span>
+                </div>
+                <p className="text-[10px] text-[#8B7355]">
+                  Click "Pay Securely" to trigger the sandbox payment handler and instantly unlock Tanders.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={() => setPaymentModalOpen(false)}
+                  disabled={paying}
+                  className="w-1/2 py-3 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#8B7355] border border-[#C9A96E]/20 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    setPaying(true);
+                    await new Promise(r => setTimeout(r, 1500));
+                    localStorage.setItem("tenders_unlocked", "true");
+                    setUnlocked(true);
+                    setPaymentModalOpen(false);
+                    setPaying(false);
+                  }}
+                  disabled={paying}
+                  className="w-1/2 py-3 rounded-full bg-[#C9A96E] hover:bg-[#B8944F] text-[#0D0D0D] text-[10px] font-bold uppercase tracking-widest transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {paying ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-[#0D0D0D]/20 border-t-[#0D0D0D] rounded-full animate-spin" />
+                      Securing...
+                    </>
+                  ) : (
+                    "Pay Securely"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-[#F5F0E8] font-sans pb-20">
       {/* Navbar / Header */}
@@ -215,7 +401,7 @@ export default function TendersPage() {
               className="flex items-center gap-2 rounded-full border border-[#C9A96E]/50 bg-[#C9A96E]/50 px-4 py-2 text-xs text-white hover:bg-[#C9A96E] transition-colors disabled:opacity-50"
             >
               <RotateCw className={`h-3 w-3 ${syncing ? "animate-spin" : ""}`} />
-              {syncing ? "Syncing Live GeM..." : "Sync Live Tenders"}
+              {syncing ? "Syncing Live Tanders..." : "Sync Live Tanders"}
             </button>
           </div>
         </div>
@@ -226,11 +412,11 @@ export default function TendersPage() {
 
         {/* Title Hero */}
         <div className="mb-10 text-center md:text-left">
-          <h1 className="text-4xl font-cormorant font-bold text-[#F5F0E8] tracking-wide mb-2">
+          <h1 className="text-4xl font-cormorant font-bold text-[#F5F0E8] tracking-wide mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             Government Tender Discovery
           </h1>
           <p className="text-sm text-[#8B7355] max-w-2xl">
-            Browse and discover engineering, design, fabrication, and manufacturing opportunities sourced live from Government e-Marketplace (GeM) India.
+            Browse and discover engineering, design, fabrication, and manufacturing opportunities sourced live from Government e-Marketplace (Tanders) India.
           </p>
         </div>
 
@@ -316,35 +502,6 @@ export default function TendersPage() {
 
         {/* Tab System & Search Controls */}
         <div className="bg-[#1A1714] border border-[#C9A96E]/10 rounded-2xl p-6 mb-8 shadow-md">
-          {/* Tabs */}
-          {/* <div className="flex border-b border-[#C9A96E]/10 pb-4 mb-6 gap-6">
-            <button
-              onClick={() => handleTabChange("all")}
-              className={`pb-2 text-sm font-semibold tracking-wide transition-all relative ${activeTab === "all"
-                ? "text-[#C9A96E]"
-                : "text-[#8B7355] hover:text-[#F5F0E8]"
-                }`}
-            >
-              All Tenders
-              {activeTab === "all" && (
-                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#C9A96E]"></span>
-              )}
-            </button>
-            <button
-              onClick={() => handleTabChange("relevant")}
-              className={`pb-2 text-sm font-semibold tracking-wide transition-all relative flex items-center gap-1.5 ${activeTab === "relevant"
-                ? "text-[#C9A96E]"
-                : "text-[#8B7355] hover:text-[#F5F0E8]"
-                }`}
-            >
-              <Cpu className="h-3.5 w-3.5" />
-              CNC & Manufacturing Tenders
-              {activeTab === "relevant" && (
-                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#C9A96E]"></span>
-              )}
-            </button>
-          </div> */}
-
           {/* Search and Filters grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
@@ -455,9 +612,9 @@ export default function TendersPage() {
                 key={tender.id}
                 className="bg-[#1A1714] border border-[#C9A96E]/10 rounded-xl p-6 hover:border-[#C9A96E]/30 transition-all shadow-md group relative overflow-hidden"
               >
-                {/* GeM Tag Badge */}
+                {/* Tenders Tag Badge */}
                 <div className="absolute top-0 right-0 bg-[#C9A96E]/10 border-l border-b border-[#C9A96E]/15 px-3 py-1 rounded-bl-lg text-[9px] text-[#C9A96E] font-semibold tracking-wider uppercase">
-                  {tender.source}
+                  {tender.source === "GeM" ? "Tanders" : (tender.source || "Tanders")}
                 </div>
 
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -581,7 +738,7 @@ export default function TendersPage() {
               <p className="text-xs font-semibold text-[#F5F0E8]">{toast.message}</p>
               <p className="text-[10px] text-[#C9A96E] font-mono mt-0.5">{toast.bidNumber}</p>
               <p className="text-[10px] text-[#8B7355] mt-1.5">
-                Paste this into the GeM search bar to find your tender.
+                Paste this into the Tanders search bar to find your tender.
               </p>
             </div>
           </div>
