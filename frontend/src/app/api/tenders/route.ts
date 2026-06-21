@@ -152,7 +152,7 @@ export async function GET(request: Request) {
 
     queryText += ' ORDER BY end_date ASC NULLS LAST';
     queryText += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    
+
     const allParams = [...queryParams, limit, offset];
 
     let tenders: any[] = [];
@@ -166,7 +166,7 @@ export async function GET(request: Request) {
       tenders = dataRes.rows;
     } catch (dbQueryErr: any) {
       console.warn("Database query failed, using fallback mock tenders:", dbQueryErr.message);
-      
+
       let filtered = MOCK_TENDERS;
       if (search) {
         const lowerSearch = search.toLowerCase();

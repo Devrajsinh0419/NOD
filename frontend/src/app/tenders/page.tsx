@@ -258,7 +258,7 @@ export default function TendersPage() {
             <h1 className="text-3xl md:text-4xl font-serif font-light text-[#F5F0E8] tracking-wide mb-4" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               Live Tanders Discovery Pipeline
             </h1>
-            
+
             <p className="text-sm text-[#8B7355] leading-relaxed max-w-lg mx-auto mb-8">
               Unlock real-time engineering, custom fabrication, and architectural government contracts sourced live from Government e-Marketplace India. Get a competitive edge with keyword filters and sync alerts.
             </p>
@@ -295,7 +295,7 @@ export default function TendersPage() {
               >
                 Unlock Access Now
               </button>
-              
+
               <p className="text-[10px] text-[#6B5A42]">
                 Secure payment simulation. No actual credit card details required.
               </p>

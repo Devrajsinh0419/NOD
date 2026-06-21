@@ -34,7 +34,7 @@ const buildProfessionalItems = (role: string) => [
   { label: "Overview", href: `/dashboard/${role}` },
   { label: "Projects", href: `/dashboard/${role}/projects` },
   { label: "Marketplace", href: `/dashboard/${role}/marketplace` },
-  { label: "GeM Tenders", href: "/tenders" },
+  { label: "Tanders", href: "/tenders" },
   { label: "Socialize", href: `/dashboard/${role}/socialize` },
   { label: "Chat", href: `/dashboard/${role}/chat` },
   { label: "Wallet", href: `/dashboard/${role}/wallet` },
@@ -135,8 +135,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     role === "client"
       ? clientItems
       : role === "admin"
-      ? adminItems
-      : buildProfessionalItems(role)
+        ? adminItems
+        : buildProfessionalItems(role)
 
   // Role badge color
   const roleBadgeColor: Record<string, string> = {
