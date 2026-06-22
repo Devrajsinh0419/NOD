@@ -496,15 +496,15 @@ export default function TendersPage() {
           <div className="bg-[#1A1714] border border-[#C9A96E]/15 rounded-xl p-5 relative overflow-hidden transition-all hover:border-[#C9A96E]/30 shadow-lg col-span-1">
             <p className="text-[10px] text-[#8B7355] uppercase tracking-wider font-semibold mb-2">Value Segments</p>
             <div className="space-y-1.5 text-[10px]">
-              <div className="flex justify-between items-center text-black/80">
+              <div className="flex justify-between items-center text-[#8B7355]">
                 <span>Under ₹15L</span>
                 <span className="font-semibold text-[#C9A96E]">{stats.valueBreakdown?.under15L || 0}</span>
               </div>
-              <div className="flex justify-between items-center text-black/80">
+              <div className="flex justify-between items-center text-[#8B7355]">
                 <span>₹15L - ₹50L</span>
                 <span className="font-semibold text-[#C9A96E]">{stats.valueBreakdown?.between15L50L || 0}</span>
               </div>
-              <div className="flex justify-between items-center text-black/80">
+              <div className="flex justify-between items-center text-[#8B7355]">
                 <span>Above ₹50L</span>
                 <span className="font-semibold text-[#C9A96E]">{stats.valueBreakdown?.above50L || 0}</span>
               </div>
@@ -517,7 +517,7 @@ export default function TendersPage() {
             <div className="space-y-1.5 text-[10px]">
               {stats.stateDistribution && stats.stateDistribution.length > 0 ? (
                 stats.stateDistribution.slice(0, 3).map((item, index) => (
-                  <div key={index} className="flex justify-between items-center text-black/80">
+                  <div key={index} className="flex justify-between items-center text-[#8B7355]">
                     <span className="truncate pr-2">{item.state}</span>
                     <span className="font-semibold text-[#C9A96E]">{item.count}</span>
                   </div>
@@ -779,7 +779,7 @@ export default function TendersPage() {
                             <span className="text-xs text-[#C9A96E] font-mono font-semibold tracking-wide">
                               {tender.bidNumber}
                             </span>
-                            <button
+                             <button
                               onClick={() => {
                                 navigator.clipboard.writeText(tender.bidNumber);
                                 setToast({
@@ -788,8 +788,9 @@ export default function TendersPage() {
                                 });
                                 setTimeout(() => setToast(null), 4000);
                               }}
-                              className="text-[#8B7355] hover:text-[#C9A96E] transition-colors p-0.5"
+                              className="text-[#8B7355] hover:text-[#C9A96E] transition-colors p-0.5 cursor-pointer"
                               title="Copy Bid Number"
+                              aria-label="Copy Bid Number"
                             >
                               <Copy className="h-3 w-3" />
                             </button>
@@ -868,11 +869,12 @@ export default function TendersPage() {
                     <span className="text-xs text-[#8B7355]">
                       Showing Page {page} of {totalPages} ({total} total results)
                     </span>
-                    <div className="flex items-center gap-2">
+                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setPage(p => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="p-2 rounded-lg border border-[#C9A96E]/20 text-[#8B7355] hover:text-[#C9A96E] hover:border-[#C9A96E]/50 disabled:opacity-30 disabled:hover:text-[#8B7355] disabled:hover:border-[#C9A96E]/20 transition-all"
+                        aria-label="Previous page"
+                        className="p-2 rounded-lg border border-[#C9A96E]/20 text-[#8B7355] hover:text-[#C9A96E] hover:border-[#C9A96E]/50 disabled:opacity-30 disabled:hover:text-[#8B7355] disabled:hover:border-[#C9A96E]/20 transition-all cursor-pointer"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
@@ -889,7 +891,8 @@ export default function TendersPage() {
                           <button
                             key={pageNum}
                             onClick={() => setPage(pageNum)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${page === pageNum
+                            aria-label={`Go to page ${pageNum}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${page === pageNum
                               ? "bg-[#C9A96E] text-[#0D0D0D]"
                               : "border border-[#C9A96E]/20 text-[#8B7355] hover:text-[#C9A96E] hover:border-[#C9A96E]/50"
                               }`}
@@ -902,7 +905,8 @@ export default function TendersPage() {
                       <button
                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                         disabled={page === totalPages}
-                        className="p-2 rounded-lg border border-[#C9A96E]/20 text-[#8B7355] hover:text-[#C9A96E] hover:border-[#C9A96E]/50 disabled:opacity-30 disabled:hover:text-[#8B7355] disabled:hover:border-[#C9A96E]/20 transition-all"
+                        aria-label="Next page"
+                        className="p-2 rounded-lg border border-[#C9A96E]/20 text-[#8B7355] hover:text-[#C9A96E] hover:border-[#C9A96E]/50 disabled:opacity-30 disabled:hover:text-[#8B7355] disabled:hover:border-[#C9A96E]/20 transition-all cursor-pointer"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
@@ -927,7 +931,8 @@ export default function TendersPage() {
                 </span>
                 <button
                   onClick={() => setShowMobileFilters(false)}
-                  className="p-1 rounded-full text-[#8B7355] hover:text-white"
+                  className="p-1 rounded-full text-[#8B7355] hover:text-white cursor-pointer"
+                  aria-label="Close mobile filters"
                 >
                   <X className="h-5 w-5" />
                 </button>

@@ -146,6 +146,7 @@ export default function CTASection() {
                 href="https://www.instagram.com/nod._india/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Night Owl Designers Instagram profile"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A96E]/15 bg-[#C9A96E]/5 text-[#C9A96E] transition-all duration-300 hover:bg-[#C9A96E]/15"
               >
                 <FaInstagram size={18} />
@@ -155,6 +156,7 @@ export default function CTASection() {
                 href="https://www.facebook.com/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Night Owl Designers Facebook page"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[#C9A96E]/15 bg-[#C9A96E]/5 text-[#C9A96E] transition-all duration-300 hover:bg-[#C9A96E]/15"
               >
                 <FaFacebook size={18} />

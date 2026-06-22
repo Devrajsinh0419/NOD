@@ -154,6 +154,7 @@ export default function ChatWidget() {
                 setShowTooltip(false)
               }}
               className="absolute top-2 right-2 text-[var(--text-ultra-subtle)] hover:text-[var(--text-body)] transition-colors"
+              aria-label="Close tooltip"
             >
               <X className="h-3 w-3" />
             </button>
@@ -195,6 +196,7 @@ export default function ChatWidget() {
                 <button
                   onClick={handleResetChat}
                   title="Reset conversation"
+                  aria-label="Reset conversation"
                   className="rounded-lg p-1.5 text-[var(--text-ultra-subtle)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-body)] transition-all"
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -202,6 +204,7 @@ export default function ChatWidget() {
                 <button
                   onClick={() => setIsOpen(false)}
                   title="Close chat"
+                  aria-label="Close chat assistant"
                   className="rounded-lg p-1.5 text-[var(--text-ultra-subtle)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-body)] transition-all"
                 >
                   <X className="h-4.5 w-4.5" />
@@ -260,6 +263,7 @@ export default function ChatWidget() {
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
+                aria-label="Send message"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 disabled:opacity-40 disabled:hover:bg-[var(--color-accent)] transition-all duration-200 cursor-pointer shrink-0"
               >
                 <Send className="h-4 w-4" />
