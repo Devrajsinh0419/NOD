@@ -136,8 +136,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     role === "client"
       ? clientItems
       : role === "admin"
-      ? adminItems
-      : buildProfessionalItems(role)
+        ? adminItems
+        : buildProfessionalItems(role)
 
   // Role badge color
   const roleBadgeColor: Record<string, string> = {
@@ -281,7 +281,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* User */}
           <div className="relative">
             <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-2 group">
-              <span className="text-sm text-[#F5F0E8]/80 group-hover:text-white transition-colors lowercase">
+              <span className="text-sm text-black/80 group-hover:text-black transition-colors lowercase">
                 {user.first_name || user.username}
               </span>
               <div className="w-8 h-8 rounded-full border border-[#C9A96E]/20 flex items-center justify-center bg-[#C9A96E]/5 text-[#B8A88A] overflow-hidden relative">
@@ -307,7 +307,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div className="absolute right-0 top-full mt-2 w-44 rounded-xl border border-[#C9A96E]/10 bg-[#1A1714] shadow-2xl py-2 z-50">
                 <button
                   onClick={() => { router.push(`/dashboard/${role}/profile`); setShowDropdown(false) }}
-                  className="w-full text-left px-4 py-2 text-sm text-[#F5F0E8]/80 hover:text-white hover:bg-white/5 transition-colors"
+                  className="w-full text-left px-4 py-2 text-sm text-black/80 hover:text-black hover:bg-white/5 transition-colors"
                 >
                   Profile
                 </button>
@@ -364,7 +364,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ── MOBILE SIDEBAR DRAWER ── */}
       {showMobileSidebar && (
-        <div 
+        <div
           className="fixed inset-0 z-50 md:hidden bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           onClick={() => setShowMobileSidebar(false)}
         >
