@@ -6,6 +6,7 @@ import { projectService } from "@/services/project.service"
 import type { Project } from "@/types/project.types"
 import StatusBadge from "@/components/ui/StatusBadge"
 import { getMediaUrl } from "@/lib/api"
+import { formatToUserCurrency } from "@/utils/currency"
 
 interface Props {
   role: "designer" | "architect" | "contractor"
@@ -155,7 +156,7 @@ export default function ProfessionalProjects({ role }: Props) {
 
                 <div className="mt-4 pt-3 border-t border-[#C9A96E]/6 flex items-center justify-between w-full text-[10px] text-[#6B5A42]">
                   <span>Client: {project.client_name || "NightOwl Client"}</span>
-                  <span>Budget: ${Number(project.budget_min).toLocaleString()} - ${Number(project.budget_max).toLocaleString()}</span>
+                  <span>Budget: {formatToUserCurrency(project.budget_min, project.currency || "USD")} - {formatToUserCurrency(project.budget_max, project.currency || "USD")}</span>
                 </div>
               </button>
             ))}
@@ -191,7 +192,7 @@ export default function ProfessionalProjects({ role }: Props) {
                 <div className="grid grid-cols-2 gap-2 my-3 py-2 border-y border-[#C9A96E]/6 w-full">
                   <div>
                     <p className="text-[9px] text-[#6B5A42] uppercase">My Bid</p>
-                    <p className="text-xs font-medium text-[#F5F0E8]">${Number(bid.amount).toLocaleString()}</p>
+                    <p className="text-xs font-medium text-[#F5F0E8]">{formatToUserCurrency(bid.amount, bid.currency || project.currency || "USD")}</p>
                   </div>
                   <div>
                     <p className="text-[9px] text-[#6B5A42] uppercase">Duration</p>
@@ -238,7 +239,7 @@ export default function ProfessionalProjects({ role }: Props) {
               <div>
                 <p className="text-[10px] text-[#6B5A42] uppercase tracking-wider mb-0.5">Budget</p>
                 <p className="font-medium text-[#B8A88A]">
-                  ${Number(selectedProject.budget_min).toLocaleString()} - ${Number(selectedProject.budget_max).toLocaleString()}
+                  {formatToUserCurrency(selectedProject.budget_min, selectedProject.currency || "USD")} - {formatToUserCurrency(selectedProject.budget_max, selectedProject.currency || "USD")}
                 </p>
               </div>
               <div>

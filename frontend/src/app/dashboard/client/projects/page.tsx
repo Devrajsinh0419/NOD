@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { authService } from "@/services/auth.service"
 import { projectService } from "@/services/project.service"
+import { formatToUserCurrency } from "@/utils/currency"
 import type { Project, ProjectCreateData, ProjectUpdateData } from "@/types/project.types"
 import { PROFESSIONAL_ROLE_LABELS } from "@/types/project.types"
 import StatusBadge from "@/components/ui/StatusBadge"
@@ -106,10 +107,10 @@ export default function ProjectsPage() {
   const handlePaymentSuccess = (result: any) => {
     setPaymentModalOpen(false)
     if (paymentModalMode === "accept_bid") {
-      // Update local project status and assigned professional
-      const project = result.data?.project || result.project || result.data || result
-      if (project && project.id) {
-        setProjects((prev) => prev.map((p) => (p.id === project.id ? project : p)))
+      const updatedProj = result.data?.project || result.project || result
+      if (updatedProj && updatedProj.id) {
+        // Update local project status and assigned professional
+        setProjects((prev) => prev.map((p) => (p.id === updatedProj.id ? updatedProj : p)))
       }
       // Update local bids status
       setBids((prev) =>
@@ -120,7 +121,7 @@ export default function ProjectsPage() {
       )
     } else {
       // Release payment mode: result has updated project
-      const updatedProj = result.data?.project || result.project || result.data || result
+      const updatedProj = result.data?.project || result.data || result.project || result
       if (updatedProj && updatedProj.id) {
         setProjects((prev) => prev.map((p) => (p.id === updatedProj.id ? updatedProj : p)))
       }
@@ -178,7 +179,8 @@ export default function ProjectsPage() {
   // ── Detail View ──
   if (selectedProject && !isEditing) {
     return (
-      <div className="max-w-5xl mx-auto space-y-6">
+      <>
+        <div className="max-w-5xl mx-auto space-y-6">
         {/* Back and edit headers */}
         <div className="flex items-center justify-between">
           <button
@@ -235,7 +237,7 @@ export default function ProjectsPage() {
               <p className="text-[10px] uppercase tracking-[0.25em] text-[#6B5A42] mb-1">Budget Range</p>
               <p className="text-sm text-black/60 font-medium">
                 {selectedProject.budget_min && selectedProject.budget_max
-                  ? `$${Number(selectedProject.budget_min).toLocaleString()} - $${Number(selectedProject.budget_max).toLocaleString()}`
+                  ? `${formatToUserCurrency(selectedProject.budget_min, selectedProject.currency || "USD")} - ${formatToUserCurrency(selectedProject.budget_max, selectedProject.currency || "USD")}`
                   : "—"}
               </p>
             </div>
@@ -404,7 +406,7 @@ export default function ProjectsPage() {
                       <div className="grid grid-cols-2 gap-2 my-3 py-2 border-y border-[#C9A96E]/6">
                         <div>
                           <p className="text-[9px] text-[#6B5A42] uppercase">Bid Amount</p>
-                          <p className="text-xs font-medium text-black">${Number(bid.amount).toLocaleString()}</p>
+                          <p className="text-xs font-medium text-black">{formatToUserCurrency(bid.amount, selectedProject.currency || "USD")}</p>
                         </div>
                         <div>
                           <p className="text-[9px] text-[#6B5A42] uppercase">Duration</p>
@@ -434,6 +436,14 @@ export default function ProjectsPage() {
           </div>
         </div>
       </div>
+      <EscrowPaymentModal
+        isOpen={paymentModalOpen}
+        mode={paymentModalMode}
+        targetId={paymentModalTargetId}
+        onClose={() => setPaymentModalOpen(false)}
+        onSuccess={handlePaymentSuccess}
+      />
+      </>
     )
   }
 

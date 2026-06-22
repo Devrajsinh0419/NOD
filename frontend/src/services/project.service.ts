@@ -151,16 +151,16 @@ export const projectService = {
   },
 
   /** Escrow payment system helper: get bid payment summary */
-  async getBidPaymentSummary(bidId: number): Promise<{ bid_id: number; bid_amount: number; advance_amount: number; client_fee: number; total_payable: number }> {
-    const res = await apiFetch<ApiResponse<{ bid_id: number; bid_amount: number; advance_amount: number; client_fee: number; total_payable: number }>>(
+  async getBidPaymentSummary(bidId: number): Promise<{ bid_id: number; bid_amount: number; advance_amount: number; client_fee: number; total_payable: number; currency: string }> {
+    const res = await apiFetch<ApiResponse<{ bid_id: number; bid_amount: number; advance_amount: number; client_fee: number; total_payable: number; currency: string }>>(
       `/api/bids/${bidId}/payment-summary`
     );
     return res.data!;
   },
 
   /** Escrow payment system helper: get project payment summary */
-  async getProjectPaymentSummary(projectId: number): Promise<{ project_id: number; bid_amount: number; remaining_amount: number; total_payable: number }> {
-    const res = await apiFetch<ApiResponse<{ project_id: number; bid_amount: number; remaining_amount: number; total_payable: number }>>(
+  async getProjectPaymentSummary(projectId: number): Promise<{ project_id: number; bid_amount: number; remaining_amount: number; total_payable: number; currency: string }> {
+    const res = await apiFetch<ApiResponse<{ project_id: number; bid_amount: number; remaining_amount: number; total_payable: number; currency: string }>>(
       `/api/projects/${projectId}/payment-summary`
     );
     return res.data!;
@@ -180,6 +180,18 @@ export const projectService = {
     const res = await apiFetch<ApiResponse<any>>(
       `/api/projects/${projectId}/approve-completion`,
       { method: "POST" }
+    );
+    return res;
+  },
+
+  /** Submit a project review */
+  async submitProjectReview(projectId: number, data: { rating: number; review_text?: string }): Promise<any> {
+    const res = await apiFetch<ApiResponse<any>>(
+      `/api/projects/${projectId}/submit-review`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      }
     );
     return res;
   },

@@ -6,6 +6,7 @@ import { PROFESSIONAL_ROLE_LABELS } from "@/types/project.types"
 import TagInput from "@/components/ui/TagInput"
 import FileUploadZone from "@/components/ui/FileUploadZone"
 import StatusBadge from "@/components/ui/StatusBadge"
+import { getUserCurrency } from "@/utils/currency"
 
 // ─── Professional Upload Configuration ───────────────────────────────────────
 
@@ -92,7 +93,7 @@ interface ProjectFormProps {
   onBack: () => void
 }
 
-export default function ProjectForm({ project, currency = "USD", onSave, onPublish, onBack }: ProjectFormProps) {
+export default function ProjectForm({ project, currency = getUserCurrency(), onSave, onPublish, onBack }: ProjectFormProps) {
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
@@ -116,6 +117,7 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
   const [additionalSkills, setAdditionalSkills] = useState<string[]>(project?.additional_skills || [])
   const [attachments, setAttachments] = useState<Record<string, string[]>>(project?.attachments || {})
   const [conceptDescription, setConceptDescription] = useState("")
+  const [projCurrency, setProjCurrency] = useState(project?.currency || currency)
 
   // Sync when project prop changes
   useEffect(() => {
@@ -134,6 +136,9 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
       setSelectedProfessional(project.required_professionals?.[0] || "")
       setAdditionalSkills(project.additional_skills || [])
       setAttachments(project.attachments || {})
+      if (project.currency) {
+        setProjCurrency(project.currency)
+      }
     }
   }, [project?.id])
 
@@ -156,7 +161,7 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
     property_size: propertySize ? Number(propertySize) : undefined,
     budget_min: budgetMin ? Number(budgetMin) : undefined,
     budget_max: budgetMax ? Number(budgetMax) : undefined,
-    currency,
+    currency: projCurrency,
     country,
     city,
     start_date: startDate,
@@ -414,7 +419,7 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[10px] uppercase tracking-[0.25em] text-black mb-2">
-                Min Budget {budgetType === "per_sqft" ? "/ sq ft" : ""} ({currency}) *
+                Min Budget {budgetType === "per_sqft" ? "/ sq ft" : ""} ({projCurrency}) *
               </label>
               <input
                 type="number"
@@ -433,7 +438,7 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
             </div>
             <div>
               <label className="block text-[10px] uppercase tracking-[0.25em] text-black mb-2">
-                Max Budget {budgetType === "per_sqft" ? "/ sq ft" : ""} ({currency}) *
+                Max Budget {budgetType === "per_sqft" ? "/ sq ft" : ""} ({projCurrency}) *
               </label>
               <input
                 type="number"
@@ -620,7 +625,7 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
           {/* Note */}
           <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 flex items-start gap-3">
             <span className="text-amber-400/60 text-sm mt-0.5">📌</span>
-            <p className="text-xs text-black/80 leading-relaxed">
+            <p className="text-xs text-amber-400/50 leading-relaxed">
               Keep Note in the photograph and documents for better understanding
             </p>
           </div>
@@ -679,7 +684,7 @@ export default function ProjectForm({ project, currency = "USD", onSave, onPubli
                 { label: "Design Type", value: designType },
                 { label: "Preferred Style", value: style },
                 { label: "Property Size", value: propertySize ? `${propertySize} sq ft` : "—" },
-                { label: "Budget Range", value: budgetMin && budgetMax ? `${currency} ${Number(budgetMin).toLocaleString()} – ${Number(budgetMax).toLocaleString()} ${budgetType === "per_sqft" ? "/ sq ft" : "(overall)"}` : "—" },
+                { label: "Budget Range", value: budgetMin && budgetMax ? `${projCurrency} ${Number(budgetMin).toLocaleString()} – ${Number(budgetMax).toLocaleString()} ${budgetType === "per_sqft" ? "/ sq ft" : "(overall)"}` : "—" },
                 { label: "Location", value: [city, country].filter(Boolean).join(", ") || "—" },
                 { label: "Start Date", value: startDate || "—" },
                 { label: "Completion", value: completionDate || "—" },

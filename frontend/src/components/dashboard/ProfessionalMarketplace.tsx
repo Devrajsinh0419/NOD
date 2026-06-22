@@ -15,6 +15,7 @@ import { projectService } from "@/services/project.service"
 import type { Project } from "@/types/project.types"
 import MarketplaceProjectCard from "@/components/marketplace/project-card/MarketplaceProjectCard"
 import { getMediaUrl } from "@/lib/api"
+import { formatToUserCurrency, getUserCurrency, convertCurrency } from "@/utils/currency"
 
 interface Props {
   role: "designer" | "architect" | "contractor"
@@ -128,8 +129,13 @@ export default function ProfessionalMarketplace({ role }: Props) {
     setSubmitting(true)
     setSubmitError("")
     try {
+      const proj = projects.find((p) => p.id === selectedProjectId)
+      const projectCurrency = proj?.currency || "USD"
+      const userCurrency = getUserCurrency()
+      const convertedAmount = Math.round(convertCurrency(amountVal, userCurrency, projectCurrency))
+
       await projectService.submitBid(selectedProjectId, {
-        amount: amountVal,
+        amount: convertedAmount,
         duration: trimmedDuration,
         proposal: trimmedProposal,
       })
@@ -328,7 +334,7 @@ export default function ProfessionalMarketplace({ role }: Props) {
                 )}
                 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-wider text-[#6B5A42] mb-1.5">Bid Amount ($)</label>
+                  <label className="block text-[10px] uppercase tracking-wider text-[#6B5A42] mb-1.5">Bid Amount ({getUserCurrency()})</label>
                   <input
                     type="number"
                     required
@@ -423,7 +429,7 @@ export default function ProfessionalMarketplace({ role }: Props) {
                 <p className="text-[10px] text-[#6B5A42] uppercase tracking-wider mb-0.5">Budget</p>
                 <p className="font-medium text-black/80">
                   {selectedViewProject.budget_min && selectedViewProject.budget_max
-                    ? `${selectedViewProject.currency || "USD"} ${Number(selectedViewProject.budget_min).toLocaleString()} - ${Number(selectedViewProject.budget_max).toLocaleString()}`
+                    ? `${formatToUserCurrency(selectedViewProject.budget_min, selectedViewProject.currency || "USD")} - ${formatToUserCurrency(selectedViewProject.budget_max, selectedViewProject.currency || "USD")}`
                     : "Flexible"}
                 </p>
               </div>

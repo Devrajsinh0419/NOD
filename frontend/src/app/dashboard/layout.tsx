@@ -51,6 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const [user, setUser] = useState<User | null>(null)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<{
     projects: Project[]
@@ -151,6 +152,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── TOP BAR ── */}
       <header className="h-16 border-b border-[#C9A96E]/8 bg-[#0D0D0D] flex items-center justify-between px-6 shrink-0 z-50">
         <div className="flex items-center gap-3">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+            className="md:hidden p-2 rounded-lg border border-[#C9A96E]/12 hover:bg-[#C9A96E]/5 text-[#C9A96E] transition-colors mr-1"
+            aria-label="Toggle Menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              {showMobileSidebar ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
           <div className="w-9 h-9 rounded-full border border-[#C9A96E]/20 flex items-center justify-center bg-[#C9A96E]/5 overflow-hidden">
             <Image src={logo} alt="NOD" className="w-9 h-9" />
           </div>
@@ -265,7 +281,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* User */}
           <div className="relative">
             <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-2 group">
-              <span className="text-sm text-black/80 lowercase">
+              <span className="text-sm text-[#F5F0E8]/80 group-hover:text-white transition-colors lowercase">
                 {user.first_name || user.username}
               </span>
               <div className="w-8 h-8 rounded-full border border-[#C9A96E]/20 flex items-center justify-center bg-[#C9A96E]/5 text-[#B8A88A] overflow-hidden relative">
@@ -282,7 +298,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </svg>
                 )}
               </div>
-              <svg className="w-3.5 h-3.5 text-black/80 group-hover:text-black transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-3.5 h-3.5 text-[#F5F0E8]/80 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </button>
@@ -291,7 +307,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div className="absolute right-0 top-full mt-2 w-44 rounded-xl border border-[#C9A96E]/10 bg-[#1A1714] shadow-2xl py-2 z-50">
                 <button
                   onClick={() => { router.push(`/dashboard/${role}/profile`); setShowDropdown(false) }}
-                  className="w-full text-left px-4 py-2 text-sm text-black/80 hover:text-black hover:bg-white/5 transition-colors"
+                  className="w-full text-left px-4 py-2 text-sm text-[#F5F0E8]/80 hover:text-white hover:bg-white/5 transition-colors"
                 >
                   Profile
                 </button>
@@ -345,6 +361,70 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
+
+      {/* ── MOBILE SIDEBAR DRAWER ── */}
+      {showMobileSidebar && (
+        <div 
+          className="fixed inset-0 z-50 md:hidden bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          onClick={() => setShowMobileSidebar(false)}
+        >
+          <aside
+            onClick={(e) => e.stopPropagation()}
+            className="absolute left-0 top-0 bottom-0 w-64 bg-[#0B0B09] border-r border-[#C9A96E]/10 p-6 flex flex-col justify-between"
+          >
+            <div className="space-y-6">
+              {/* Menu Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-[#C9A96E]/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full border border-[#C9A96E]/20 flex items-center justify-center bg-[#C9A96E]/5 overflow-hidden">
+                    <Image src={logo} alt="NOD" className="w-8 h-8" />
+                  </div>
+                  <span className="text-base font-serif font-semibold text-[#F5F0E8]">Navigation</span>
+                </div>
+                <button
+                  onClick={() => setShowMobileSidebar(false)}
+                  className="w-7 h-7 rounded-full border border-[#C9A96E]/12 text-[#8B7355] hover:text-white flex items-center justify-center text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Menu Links */}
+              <nav className="space-y-1.5">
+                {sidebarItems.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={() => {
+                        router.push(item.href)
+                        setShowMobileSidebar(false)
+                      }}
+                      className={`w-full flex items-center px-5 py-2.5 rounded-full text-sm transition-all duration-300 ${isActive
+                        ? "border border-[#C9A96E]/40 bg-[#C9A96E]/8 text-[#C9A96E] shadow-[0_0_15px_rgba(201,169,110,0.05)]"
+                        : "text-[#8B7355] hover:text-[#B8A88A]"
+                        }`}
+                    >
+                      {item.label}
+                      {item.label === "Marketplace" && (
+                        <span className="ml-auto text-[8px] bg-[#C9A96E]/10 text-[#C9A96E]/60 px-1.5 py-0.5 rounded-full font-sans">
+                          NEW
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </nav>
+            </div>
+
+            {/* Bottom Role Information */}
+            <div className="px-4 py-3 rounded-xl bg-[#C9A96E]/3 border border-[#C9A96E]/8">
+              <p className="text-[9px] uppercase tracking-[0.25em] text-[#6B5A42] mb-0.5">Logged in as</p>
+              <p className={`text-xs capitalize font-medium ${roleBadgeColor[role] || "text-[#8B7355]"}`}>{role}</p>
+            </div>
+          </aside>
+        </div>
+      )}
     </div>
   )
 }

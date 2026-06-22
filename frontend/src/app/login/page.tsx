@@ -227,6 +227,73 @@ function LoginContent() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
+  const [username, setUsername] = useState("")
+  const [termsAccepted, setTermsAccepted] = useState(false)
+
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpCode, setOtpCode] = useState("")
+  const [otpVerified, setOtpVerified] = useState(false)
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [otpMessage, setOtpMessage] = useState("")
+
+  const handleSendOTP = async () => {
+    if (!email.trim() || emailError) {
+      setError("Please enter a valid email address first")
+      return
+    }
+    if (!phone.trim() || phoneError) {
+      setError("Please enter a valid phone number first")
+      return
+    }
+    setOtpLoading(true)
+    setOtpMessage("")
+    setError("")
+    try {
+      const fullPhone = `${phoneCode}${phone}`
+      const response = await authService.sendOtp(email.trim(), fullPhone)
+      if (response.success) {
+        setOtpSent(true)
+        setOtpMessage("OTP sent successfully to your email!")
+      } else {
+        setError(response.message || "Failed to send OTP")
+      }
+    } catch (err: any) {
+      setError(err?.message || "Failed to send OTP. Please check your credentials.")
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const handleVerifyOTP = async () => {
+    if (!otpCode.trim() || otpCode.length < 6) {
+      setError("Please enter a valid 6-digit OTP code")
+      return
+    }
+    setOtpLoading(true)
+    setOtpMessage("")
+    setError("")
+    try {
+      const fullPhone = `${phoneCode}${phone}`
+      const response = await authService.verifyOtp(fullPhone, otpCode.trim())
+      if (response.success) {
+        setOtpVerified(true)
+        setOtpMessage("Email verified successfully!")
+      } else {
+        setError(response.message || "Invalid or expired OTP")
+      }
+    } catch (err: any) {
+      setError(err?.message || "OTP verification failed.")
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const validateUsernameInput = (val: string) => {
+    if (!val) return "Username is required"
+    if (val.length < 3) return "Username must be at least 3 characters"
+    if (!/^[a-zA-Z0-9_]+$/.test(val)) return "Username can only contain letters, numbers, and underscores"
+    return ""
+  }
 
   // Forgot Password modal state
   const [showForgotModal, setShowForgotModal] = useState(false)
@@ -284,12 +351,22 @@ function LoginContent() {
   // Computed validation state (recalculated each render)
   const phoneError = validatePhone(phone, phoneCode)
   const emailError = validateEmail(email)
+  const usernameError = username ? validateUsernameInput(username) : null
   const passwordStatus = validatePassword(password)
   const passwordAllPass = passwordStatus?.checks.every((c) => c.pass) ?? false
 
   const handleNext = () => {
-    if (!fullName || !email || !password || !phone || !role) {
+    if (!role) {
+      setError("Please select a role")
+      return
+    }
+    if (!fullName.trim() || !username.trim() || !email.trim() || !password || !phone.trim()) {
       setError("Please fill all required fields")
+      return
+    }
+    const uError = validateUsernameInput(username)
+    if (uError) {
+      setError(uError)
       return
     }
     if (phoneError) {
@@ -300,8 +377,16 @@ function LoginContent() {
       setError(emailError)
       return
     }
+    if (!otpVerified) {
+      setError("Please verify your email via OTP before proceeding")
+      return
+    }
     if (!passwordAllPass) {
       setError("Password does not meet all requirements")
+      return
+    }
+    if (!termsAccepted) {
+      setError("You must accept the Terms and Conditions to proceed")
       return
     }
     setError("")
@@ -358,6 +443,72 @@ function LoginContent() {
         setError(emailError)
         return
       }
+    } else {
+      // Signup validations
+      if (!role) {
+        setError("Role is required")
+        return
+      }
+      if (!fullName.trim() || !username.trim() || !email.trim() || !password || !phone.trim()) {
+        setError("Please fill all step 1 fields")
+        return
+      }
+      const uError = validateUsernameInput(username)
+      if (uError) {
+        setError(uError)
+        return
+      }
+      if (phoneError) {
+        setError(phoneError)
+        return
+      }
+      if (emailError) {
+        setError(emailError)
+        return
+      }
+      if (!passwordAllPass) {
+        setError("Password does not meet all requirements")
+        return
+      }
+      if (!termsAccepted) {
+        setError("You must accept the Terms and Conditions to proceed")
+        return
+      }
+      if (!country) {
+        setError("Country is required")
+        return
+      }
+      if (!location) {
+        setError("Location is required")
+        return
+      }
+
+      // Validate role specific fields
+      const fields = ROLE_FIELDS[role]?.fields || []
+      for (const f of fields) {
+        const val = roleFields[f.id]
+        if (!val || !val.trim()) {
+          setError(`${f.label} is required`)
+          return
+        }
+      }
+
+      if (role === "Contractor") {
+        if (!gstinStatus || !gstinStatus.valid) {
+          setError("Please enter and verify a valid GSTIN number")
+          return
+        }
+      }
+      if (role === "Designer" && (roleFields.specialization === "AutoCAD Designer" || roleFields.specialization === "Structural Designer")) {
+        if (!govtVerified) {
+          setError("You must verify with the government for AutoCAD or Structural Designer roles")
+          return
+        }
+        if (!roleFields.licenseNumber || !roleFields.licenseNumber.trim()) {
+          setError("License Number is required for AutoCAD or Structural Designer roles")
+          return
+        }
+      }
     }
 
     setLoading(true)
@@ -366,7 +517,7 @@ function LoginContent() {
         const [firstName, ...rest] = fullName.trim().split(" ")
         const lastName = rest.join(" ") || ""
         await authService.register({
-          username: email.split("@")[0],
+          username,
           email,
           first_name: firstName,
           last_name: lastName,
@@ -654,6 +805,23 @@ function LoginContent() {
               </div>
 
               <div className="group">
+                <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">Username</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.trim().toLowerCase())}
+                  placeholder="johndoe123"
+                  className={`${inputClass} ${usernameError === "" ? "border-green-500/20" : usernameError ? "border-red-400/20" : ""}`}
+                  required
+                />
+                {usernameError !== null && (
+                  <p className={`mt-1.5 text-[10px] ${usernameError ? "text-red-400/60" : "text-green-400/50"}`}>
+                    {usernameError || "Valid username ✓"}
+                  </p>
+                )}
+              </div>
+
+              <div className="group">
                 <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">Phone Number</label>
                 <div className="flex gap-2">
                   <select
@@ -700,19 +868,71 @@ function LoginContent() {
 
               <div className="group">
                 <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@email.com"
-                  className={`${inputClass} ${emailError === "" ? "border-green-500/20" : emailError ? "border-red-400/20" : ""}`}
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setOtpSent(false)
+                      setOtpVerified(false)
+                      setOtpCode("")
+                      setOtpMessage("")
+                    }}
+                    disabled={otpVerified}
+                    placeholder="name@email.com"
+                    className={`${inputClass} flex-1 ${emailError === "" ? "border-green-500/20" : emailError ? "border-red-400/20" : ""} ${otpVerified ? "opacity-60 cursor-not-allowed border-green-500/30" : ""}`}
+                  />
+                  {!otpVerified && (
+                    <button
+                      type="button"
+                      onClick={handleSendOTP}
+                      disabled={otpLoading || emailError !== "" || !email.trim() || phoneError !== "" || !phone.trim()}
+                      className="rounded-xl border border-[#C9A96E]/20 bg-[#C9A96E]/5 px-4 text-xs font-medium text-[#C9A96E] hover:bg-[#C9A96E]/12 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    >
+                      {otpLoading ? "Sending..." : otpSent ? "Resend" : "Send OTP"}
+                    </button>
+                  )}
+                </div>
                 {emailError !== null && (
                   <p className={`mt-1.5 text-[10px] ${emailError ? "text-red-400/60" : "text-green-400/50"}`}>
                     {emailError || "Valid email ✓"}
                   </p>
                 )}
+                {otpVerified && (
+                  <p className="mt-1.5 text-[10px] text-green-400/50">
+                    Email verified successfully ✓
+                  </p>
+                )}
               </div>
+
+              {otpSent && !otpVerified && (
+                <div className="group animate-fadeIn">
+                  <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">Enter OTP</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="6-digit OTP"
+                      className={`${inputClass} flex-1`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOTP}
+                      disabled={otpLoading || otpCode.length < 6}
+                      className="rounded-xl bg-[#C9A96E] text-black px-4 text-xs font-semibold hover:bg-[#C9A96E]/90 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    >
+                      {otpLoading ? "Verifying..." : "Verify OTP"}
+                    </button>
+                  </div>
+                  {otpMessage && (
+                    <p className="mt-1.5 text-[10px] text-amber-400/70">
+                      {otpMessage}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div className="group">
                 <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">Password</label>
@@ -756,10 +976,16 @@ function LoginContent() {
               </div>
 
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="terms" defaultChecked className="checkbox bg-[#C9A96E]/40 border-[#C9A96E]/20" />
-                <label htmlFor="terms" className="text-xs text-[#8B7355] hover:text-[#B8A88A] transition-colors">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="checkbox bg-[#C9A96E]/40 border-[#C9A96E]/20"
+                />
+                <label htmlFor="terms" className="text-xs text-white transition-colors">
                   I agree to the{" "}
-                  <a href="#" className="hover:text-[#C9A96E]">Terms and Conditions</a>
+                  <a href="#" className="">Terms and Conditions</a>
                 </label>
               </div>
             </div>
@@ -784,7 +1010,7 @@ function LoginContent() {
 
               {/* Country */}
               <div className="group">
-                <label className="block text-[10px] uppercase tracking-[0.3em] text-[#8B7355] mb-2">Country</label>
+                <label className="block text-[10px] uppercase tracking-[0.3em] text-white mb-2">Country</label>
                 <select
                   value={country}
                   onChange={(e) => {
@@ -804,7 +1030,7 @@ function LoginContent() {
 
               {/* Currency */}
               <div className="group">
-                <label className="block text-[10px] uppercase tracking-[0.3em] text-[#8B7355] mb-2">Currency</label>
+                <label className="block text-[10px] uppercase tracking-[0.3em] text-white mb-2">Currency</label>
                 <input
                   type="text"
                   value={currency}
@@ -816,7 +1042,7 @@ function LoginContent() {
 
               {/* Location */}
               <div className="group">
-                <label className="block text-[10px] uppercase tracking-[0.3em] text-[#8B7355] mb-2">Location</label>
+                <label className="block text-[10px] uppercase tracking-[0.3em] text-white mb-2">Location</label>
                 <button
                   type="button"
                   onClick={getLocation}
@@ -842,7 +1068,7 @@ function LoginContent() {
 
                   {roleConfig.fields.map((field) => (
                     <div key={field.id} className="group">
-                      <label className="block text-[10px] uppercase tracking-[0.3em] text-[#8B7355] mb-2">
+                      <label className="block text-[10px] uppercase tracking-[0.3em] text-white mb-2">
                         {field.isCurrency ? `${field.label} (${currency || "USD"})` : field.label}
                       </label>
 
@@ -1010,7 +1236,7 @@ function LoginContent() {
                 handleSubmit(e)
               }
             }}
-            disabled={loading}
+            disabled={loading || (isSignUp && step === 1 && (!termsAccepted || !otpVerified))}
             className="mt-5 w-full rounded-full bg-linear-to-r from-[#C9A96E] to-[#B8944F] py-3.5 text-sm font-medium tracking-[0.15em] uppercase text-[#0D0D0D] transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,169,110,0.2)] hover:tracking-[0.2em] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Please wait..." : isSignUp ? (step === 1 ? "Next" : "Create Account") : "Sign In"}
@@ -1029,7 +1255,7 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => { setIsSignUp(!isSignUp); setStep(1); setError(""); setRoleFields({}) }}
-              className="ml-1 text-[#C9A96E] hover:text-[#E8D5B5]"
+              className="ml-1 text-white/60 hover:text-white"
             >
               {isSignUp ? "Sign In" : "Create One"}
             </button>

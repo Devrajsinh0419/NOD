@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { authService } from "@/services/auth.service"
 import { walletService } from "@/services/wallet.service"
 import type { WalletData, WalletTransaction, BankAccountData } from "@/types/wallet.types"
+import { formatToUserCurrency, getUserCurrency, convertCurrency } from "@/utils/currency"
 
 export default function WalletView() {
   const [userId, setUserId] = useState<number | null>(null)
@@ -101,15 +102,24 @@ export default function WalletView() {
       alert("Please enter a valid withdrawal amount.")
       return
     }
-    if (wallet && wallet.balance < amt) {
+
+    const userCurrency = getUserCurrency()
+    const amtInINR = convertCurrency(amt, userCurrency, "INR")
+
+    if (amtInINR < 100) {
+      alert(`Minimum withdrawal amount is ${formatToUserCurrency(100, "INR")}`)
+      return
+    }
+
+    if (wallet && wallet.balance < amtInINR) {
       alert("Insufficient available balance.")
       return
     }
 
     try {
       setModalLoading(true)
-      const res = await walletService.withdraw(userId, amt)
-      alert(res.transaction.description || `Successfully requested withdrawal of ₹${amt.toLocaleString()}`)
+      const res = await walletService.withdraw(userId, amtInINR)
+      alert(res.transaction.description || `Successfully requested withdrawal of ${formatToUserCurrency(amtInINR, "INR")}`)
       setShowWithdraw(false)
       setAmountInput("")
       // Reload wallet
@@ -123,11 +133,7 @@ export default function WalletView() {
   }
 
   const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(val)
+    return formatToUserCurrency(val, "INR")
   }
 
   const formatShortDate = (isoStr: string) => {
@@ -187,7 +193,7 @@ export default function WalletView() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#C9A96E]/20 pb-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-light tracking-wide font-serif text-black" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          <h2 className="text-3xl font-light tracking-wide font-serif text-[#F5F0E8]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             Professional Wallet
           </h2>
           <p className="text-xs text-[#8B7355] font-light">
@@ -207,7 +213,7 @@ export default function WalletView() {
               setShowWithdraw(true)
             }}
             disabled={wallet.balance <= 0}
-            className={`px-8 py-3 rounded-full font-serif tracking-widest text-xs uppercase transition-all duration-300 ${wallet.balance > 0
+            className={`w-full md:w-auto text-center px-8 py-3 rounded-full font-serif tracking-widest text-xs uppercase transition-all duration-300 ${wallet.balance > 0
               ? "bg-gradient-to-r from-[#C9A96E] to-[#B8944F] text-[#0D0D0D] font-bold shadow-lg hover:shadow-[#C9A96E]/20 hover:scale-[1.02]"
               : "bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700"
               }`}
@@ -472,32 +478,32 @@ export default function WalletView() {
                 <label className="text-[9px] uppercase tracking-widest text-[#8B7355]">Amount to Withdraw</label>
                 <input
                   type="number"
-                  placeholder="Amount (₹)"
+                  placeholder={`Amount (${getUserCurrency()})`}
                   required
-                  min="100"
-                  max={wallet?.balance || 0}
+                  min={convertCurrency(100, "INR", getUserCurrency())}
+                  max={wallet ? convertCurrency(wallet.balance, "INR", getUserCurrency()) : 0}
                   value={amountInput}
                   onChange={(e) => setAmountInput(e.target.value)}
                   className="w-full rounded-xl bg-[#C9A96E]/5 border border-[#C9A96E]/20 px-4 py-3 text-xs text-[#F5F0E8] placeholder-[#8B7355]/40 outline-none focus:border-[#C9A96E]/40"
                 />
                 <div className="flex justify-between text-[9px] text-[#8B7355] pt-1">
                   <span>Available: {formatCurrency(wallet?.balance || 0)}</span>
-                  <span>Min: ₹100</span>
+                  <span>Min: {formatToUserCurrency(100, "INR")}</span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-[#C9A96E]/10">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-[#C9A96E]/10">
                 <button
                   type="button"
                   onClick={() => setShowWithdraw(false)}
-                  className="px-4 py-2.5 rounded-xl text-[10px] uppercase font-bold text-[#8B7355] hover:text-white transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-[10px] uppercase font-bold text-[#8B7355] hover:text-white transition-colors text-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={modalLoading}
-                  className="px-6 py-2.5 rounded-xl bg-[#C9A96E] hover:bg-[#B8944F] text-[#0D0D0D] text-[10px] font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#C9A96E] hover:bg-[#B8944F] text-[#0D0D0D] text-[10px] font-bold uppercase tracking-wider transition-colors disabled:opacity-50 text-center"
                 >
                   {modalLoading ? "Requesting..." : "Confirm Request"}
                 </button>

@@ -7,17 +7,21 @@ import type { UserProfile as UserProfileType } from "@/types/user.types"
 import StatusBadge from "@/components/ui/StatusBadge"
 import type { ProjectStatus } from "@/types/project.types"
 import { API_BASE } from "@/lib/api"
+import { useRouter } from "next/navigation"
 
 interface Props {
   role: "client" | "designer" | "architect" | "contractor"
 }
 
 export default function UserProfile({ role }: Props) {
+  const router = useRouter()
   const [profile, setProfile] = useState<UserProfileType | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -147,6 +151,29 @@ export default function UserProfile({ role }: Props) {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true)
+    setError("")
+    try {
+      const userObj = authService.getStoredUser()
+      if (!userObj) return
+      
+      await userService.deleteAccount(userObj.id)
+      
+      localStorage.removeItem("nod_user")
+      localStorage.removeItem("nod_token")
+      window.dispatchEvent(new Event("storage"))
+      
+      setShowDeleteModal(false)
+      router.push("/login")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete account")
+      setShowDeleteModal(false)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -192,10 +219,10 @@ export default function UserProfile({ role }: Props) {
         )}
 
         {/* Client Header Card */}
-        <div className="rounded-3xl border border-[#C9A96E]/50 bg-[#1A1714] p-8 flex items-center gap-6">
+        <div className="rounded-3xl border border-[#C9A96E]/50 bg-[#1A1714] p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
           <div
             onClick={triggerFileInput}
-            className="w-24 h-24 rounded-full overflow-hidden shrink-0 border border-[#C9A96E]/12 relative bg-[#C9A96E]/5 flex items-center justify-center group cursor-pointer"
+            className="w-24 h-24 rounded-full overflow-hidden shrink-0 border border-[#C9A96E]/12 relative bg-[#C9A96E]/5 flex items-center justify-center group cursor-pointer mx-auto sm:mx-0"
           >
             {uploadingPhoto ? (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -214,19 +241,20 @@ export default function UserProfile({ role }: Props) {
               </span>
             )}
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 w-full flex-1 min-w-0">
             <div>
               <h2
-                className="text-3xl font-light text-[#F5F0E8] leading-tight"
+                className="text-3xl font-light text-[#F5F0E8] leading-tight break-words"
                 style={{ fontFamily: "'Cormorant Garamond', serif" }}
               >
                 {formatDisplayName(details.full_name, user.first_name, user.last_name, user.username)}
               </h2>
-              <p className="text-xs text-[#6B5A42] tracking-widest uppercase">Client</p>
+              <p className="text-xs text-[#8B7355] font-mono mt-0.5 break-all">@{user.username}</p>
+              <p className="text-xs text-[#6B5A42] tracking-widest uppercase mt-1">Client</p>
             </div>
             <button
               onClick={() => setShowEditModal(true)}
-              className="px-6 py-2.5 rounded-xl border border-[#C9A96E]/20 bg-white hover:bg-[#B8944F] text-black text-xs font-medium transition-colors"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl border border-[#C9A96E]/20 bg-white hover:bg-[#B8944F] text-black text-xs font-medium transition-colors text-center"
             >
               Edit Profile
             </button>
@@ -234,16 +262,16 @@ export default function UserProfile({ role }: Props) {
         </div>
 
         {/* Client Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="rounded-2xl border border-[#C9A96E]/50 bg-[#1A1714] p-6 text-center space-y-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+          <div className="rounded-2xl border border-[#C9A96E]/50 bg-[#1A1714] p-4 sm:p-6 text-center space-y-1">
             <p className="text-[10px] text-[#6B5A42] uppercase tracking-[0.2em]">Projects Posted</p>
             <p className="text-3xl font-light text-[#F5F0E8] font-mono">{stats.projects_posted || 0}</p>
           </div>
-          <div className="rounded-2xl border border-[#C9A96E]/50 bg-[#1A1714] p-6 text-center space-y-1">
+          <div className="rounded-2xl border border-[#C9A96E]/50 bg-[#1A1714] p-4 sm:p-6 text-center space-y-1">
             <p className="text-[10px] text-[#6B5A42] uppercase tracking-[0.2em]">Professionals Hired</p>
             <p className="text-3xl font-light text-[#F5F0E8] font-mono">{stats.professionals_hired || 0}</p>
           </div>
-          <div className="rounded-2xl border border-[#C9A96E]/50 bg-[#1A1714] p-6 text-center space-y-1">
+          <div className="rounded-2xl border border-[#C9A96E]/50 bg-[#1A1714] p-4 sm:p-6 text-center space-y-1">
             <p className="text-[10px] text-[#6B5A42] uppercase tracking-[0.2em]">Completed Projects</p>
             <p className="text-3xl font-light text-[#F5F0E8] font-mono">{stats.completed_projects || 0}</p>
           </div>
@@ -262,15 +290,15 @@ export default function UserProfile({ role }: Props) {
               {profile.active_projects?.map((proj) => (
                 <div
                   key={proj.id}
-                  className="rounded-2xl border border-[#C9A96E]/8 bg-[#1A1714] p-5 flex items-center justify-between"
+                  className="rounded-2xl border border-[#C9A96E]/8 bg-[#1A1714] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
-                  <div>
-                    <h5 className="text-sm font-medium text-[#F5F0E8] mb-1">{proj.title}</h5>
-                    <p className="text-xs text-[#6B5A42]">Assigned to {proj.assigned_professional_name}</p>
+                  <div className="min-w-0 flex-1">
+                    <h5 className="text-sm font-medium text-[#F5F0E8] mb-1 break-words">{proj.title}</h5>
+                    <p className="text-xs text-[#6B5A42] truncate">Assigned to {proj.assigned_professional_name}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right shrink-0 flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 sm:gap-1.5">
                     <StatusBadge status={proj.status as ProjectStatus} />
-                    <p className="text-[10px] text-[#6B5A42] mt-1.5">Completion • {proj.completion_date}</p>
+                    <p className="text-[10px] text-[#6B5A42] mt-0.5 sm:mt-1.5">Completion • {proj.completion_date}</p>
                   </div>
                 </div>
               ))}
@@ -320,28 +348,52 @@ export default function UserProfile({ role }: Props) {
           >
             Account Information
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-xs">
-            <div className="flex justify-between md:justify-start gap-4">
-              <span className="text-[#6B5A42] w-24">Email :</span>
-              <span className="text-white/60">{user.email}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-1 sm:gap-4 border-b border-[#C9A96E]/5 sm:border-none pb-2 sm:pb-0">
+              <span className="text-[#6B5A42] w-full sm:w-24 shrink-0 font-medium sm:font-normal">Email:</span>
+              <span className="text-white/60 break-all w-full sm:w-auto">{user.email}</span>
             </div>
-            <div className="flex justify-between md:justify-start gap-4">
-              <span className="text-[#6B5A42] w-24">Phone No :</span>
-              <span className="text-white/60">{details.contact_phone || "Not provided"}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-1 sm:gap-4 border-b border-[#C9A96E]/5 sm:border-none pb-2 sm:pb-0">
+              <span className="text-[#6B5A42] w-full sm:w-24 shrink-0 font-medium sm:font-normal">Phone No:</span>
+              <span className="text-white/60 break-all w-full sm:w-auto">{details.contact_phone || "Not provided"}</span>
             </div>
-            <div className="flex justify-between md:justify-start gap-4">
-              <span className="text-[#6B5A42] w-24">Location :</span>
-              <span className="text-white/60">{details.address || "Not provided"}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-1 sm:gap-4 border-b border-[#C9A96E]/5 sm:border-none pb-2 sm:pb-0">
+              <span className="text-[#6B5A42] w-full sm:w-24 shrink-0 font-medium sm:font-normal">Location:</span>
+              <span className="text-white/60 break-words w-full sm:w-auto">{details.address || "Not provided"}</span>
             </div>
-            <div className="flex justify-between md:justify-start gap-4">
-              <span className="text-[#6B5A42] w-24">Member Since :</span>
-              <span className="text-white/60">{formattedDate}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-1 sm:gap-4 pb-2 sm:pb-0">
+              <span className="text-[#6B5A42] w-full sm:w-24 shrink-0 font-medium sm:font-normal">Member Since:</span>
+              <span className="text-white/60 w-full sm:w-auto">{formattedDate}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="rounded-2xl border border-red-500/30 bg-[#1A1714] p-6 space-y-4">
+          <h4
+            className="text-lg font-light text-red-400 font-serif"
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          >
+            Danger Zone
+          </h4>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <p className="text-xs text-[#8B7355] leading-relaxed">
+              Once you delete your account, there is no going back. Please be certain.
+            </p>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-red-500/20 bg-red-950/20 hover:bg-red-900/40 text-red-400 text-xs font-semibold transition-all shrink-0 text-center"
+            >
+              Delete Account
+            </button>
           </div>
         </div>
 
         {/* Edit Modal */}
         {showEditModal && renderEditModal()}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && renderDeleteModal()}
       </div>
     )
   }
@@ -370,11 +422,11 @@ export default function UserProfile({ role }: Props) {
       )}
 
       {/* Professional Header Card */}
-      <div className="rounded-3xl border border-[#C9A96E]/80 bg-[#1A1714] p-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
-        <div className="flex flex-col md:flex-row items-center gap-6">
+      <div className="rounded-3xl border border-[#C9A96E]/80 bg-[#1A1714] p-6 sm:p-8 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left w-full lg:w-auto">
           <div
             onClick={triggerFileInput}
-            className="w-24 h-24 rounded-full overflow-hidden shrink-0 border border-[#C9A96E]/12 relative bg-[#C9A96E]/5 flex items-center justify-center group cursor-pointer"
+            className="w-24 h-24 rounded-full overflow-hidden shrink-0 border border-[#C9A96E]/12 relative bg-[#C9A96E]/5 flex items-center justify-center group cursor-pointer mx-auto sm:mx-0"
           >
             {uploadingPhoto ? (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -393,28 +445,29 @@ export default function UserProfile({ role }: Props) {
               </span>
             )}
           </div>
-          <div className="space-y-3 text-center md:text-left">
+          <div className="space-y-3 text-center sm:text-left w-full sm:flex-1 min-w-0">
             <div>
               <h2
-                className="text-3xl font-light text-[#F5F0E8] leading-tight"
+                className="text-3xl font-light text-[#F5F0E8] leading-tight break-words"
                 style={{ fontFamily: "'Cormorant Garamond', serif" }}
               >
                 {formatDisplayName(details.full_name, user.first_name, user.last_name, user.username)}
               </h2>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-[#8B7355] font-mono mt-0.5 break-all">@{user.username}</p>
+              <p className="text-xs text-white/60 mt-1">
                 {defaultRoleTitle} {details.specialization ? `• ${details.specialization.split(",")[0]}` : ""}
               </p>
             </div>
             {details.portfolio_description && (
-              <p className="text-xs text-[#8B7355] max-w-md leading-relaxed">
+              <p className="text-xs text-[#8B7355] max-w-md leading-relaxed mx-auto sm:mx-0 break-words">
                 {details.portfolio_description}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex flex-col items-center md:items-end justify-between self-stretch shrink-0 gap-4">
-          <div className="flex gap-6 text-center md:text-right">
+        <div className="flex flex-col items-center lg:items-end justify-between self-stretch lg:self-auto shrink-0 gap-4 w-full lg:w-auto">
+          <div className="flex gap-6 justify-center lg:justify-end text-center lg:text-right w-full">
             <div>
               <p className="text-lg font-light text-[#F5F0E8] font-mono">{stats.total_projects || 0}</p>
               <p className="text-[9px] uppercase tracking-wider text-[#6B5A42]">Projects</p>
@@ -430,7 +483,7 @@ export default function UserProfile({ role }: Props) {
           </div>
           <button
             onClick={() => setShowEditModal(true)}
-            className="px-6 py-2.5 rounded-xl bg-white border border-[#C9A96E]/40 hover:bg-[#B8944F] text-black text-xs font-medium transition-colors"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white border border-[#C9A96E]/40 hover:bg-[#B8944F] text-black text-xs font-medium transition-colors text-center"
           >
             Edit Profile
           </button>
@@ -447,7 +500,7 @@ export default function UserProfile({ role }: Props) {
             About
           </h4>
           <p className="text-xs text-[#8B7355] leading-relaxed">
-            {details.portfolio_description || "Specialized in luxury residential architecture and premium interior planning with emphasis on spatial flow and lighting experience."}
+            {details.portfolio_description || "No biography details provided yet."}
           </p>
         </div>
 
@@ -462,7 +515,7 @@ export default function UserProfile({ role }: Props) {
             {skillTags.map((tag: string, i: number) => (
               <span
                 key={i}
-                className="px-3 py-1.5 rounded-lg border border-[#C9A96E]/6 bg-[#C9A96E]/3 text-[11px] text-white/60"
+                className="px-3 py-1.5 rounded-lg border border-[#C9A96E]/60 bg-[#C9A96E]/3 text-[11px] text-[#F5F0E8]/90"
               >
                 {tag}
               </span>
@@ -496,17 +549,40 @@ export default function UserProfile({ role }: Props) {
           )}
         </div>
       </div>
+      {/* Danger Zone */}
+      <div className="rounded-2xl border border-red-500/30 bg-[#1A1714] p-6 space-y-4">
+        <h4
+          className="text-lg font-light text-red-400 font-serif"
+          style={{ fontFamily: "'Cormorant Garamond', serif" }}
+        >
+          Danger Zone
+        </h4>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <p className="text-xs text-[#8B7355] leading-relaxed">
+            Once you delete your account, there is no going back. Please be certain.
+          </p>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-red-500/20 bg-red-950/20 hover:bg-red-900/40 text-red-400 text-xs font-semibold transition-all shrink-0 text-center"
+          >
+            Delete Account
+          </button>
+        </div>
+      </div>
 
       {/* Edit Modal */}
       {showEditModal && renderEditModal()}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && renderDeleteModal()}
     </div>
   )
 
   // ── SHARED EDIT MODAL ──
   function renderEditModal() {
     return (
-      <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6">
-        <div className="w-full max-w-2xl rounded-3xl border border-[#C9A96E]/12 bg-[#1A1714] p-8 max-h-[90vh] overflow-y-auto space-y-6">
+      <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div className="w-full max-w-2xl rounded-3xl border border-[#C9A96E]/12 bg-[#1A1714] p-5 sm:p-8 my-8 max-h-[90vh] overflow-y-auto space-y-6">
           <div className="flex items-center justify-between">
             <h3
               className="text-2xl font-light text-[#F5F0E8] font-serif"
@@ -636,23 +712,61 @@ export default function UserProfile({ role }: Props) {
               </>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-[#C9A96E]/6">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-[#C9A96E]/6">
               <button
                 type="button"
                 onClick={() => setShowEditModal(false)}
-                className="px-5 py-2.5 rounded-xl border border-[#C9A96E]/12 text-[#8B7355] text-xs hover:text-white/70 hover:bg-[#B8944F] transition-colors"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-[#C9A96E]/12 text-[#8B7355] text-xs hover:text-white/70 hover:bg-[#B8944F]/10 transition-colors text-center"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-5 py-2.5 rounded-xl bg-[#C9A96E]/80 text-[#0D0D0D] text-xs font-semibold hover:bg-[#B8944F] transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#C9A96E]/80 text-[#0D0D0D] text-xs font-semibold hover:bg-[#B8944F] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 text-center"
               >
                 {isSaving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    )
+  }
+
+  function renderDeleteModal() {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div className="w-full max-w-md rounded-3xl border border-red-500/20 bg-[#1A1714] p-5 sm:p-8 space-y-6">
+          <div className="space-y-2">
+            <h3
+              className="text-2xl font-light text-red-400 font-serif"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
+              Delete Account
+            </h3>
+            <p className="text-xs text-[#8B7355] leading-relaxed">
+              Are you absolutely sure you want to delete your account? This action is permanent and cannot be undone. All your projects, bids, and profile details will be permanently removed.
+            </p>
+          </div>
+          
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-[#C9A96E]/6">
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(false)}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-[#C9A96E]/12 text-[#8B7355] text-xs hover:text-white transition-colors text-center"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition-colors disabled:opacity-50 text-center"
+            >
+              {isDeleting ? "Deleting..." : "Permanently Delete"}
+            </button>
+          </div>
         </div>
       </div>
     )

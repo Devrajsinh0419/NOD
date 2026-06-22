@@ -1,6 +1,7 @@
 import type { Project } from "@/types/project.types"
 import { PROFESSIONAL_ROLE_LABELS } from "@/types/project.types"
 import StatusBadge from "@/components/ui/StatusBadge"
+import { formatToUserCurrency } from "@/utils/currency"
 
 interface MarketplaceProjectCardProps {
   project: Project
@@ -11,7 +12,7 @@ interface MarketplaceProjectCardProps {
 export default function MarketplaceProjectCard({ project, onView, onApply }: MarketplaceProjectCardProps) {
   const budgetLabel =
     project.budget_min && project.budget_max
-      ? `${project.currency || "USD"} ${Number(project.budget_min).toLocaleString()} – ${Number(project.budget_max).toLocaleString()}`
+      ? `${formatToUserCurrency(project.budget_min, project.currency || "USD")} – ${formatToUserCurrency(project.budget_max, project.currency || "USD")}`
       : null
 
   const locationLabel = [project.city, project.country].filter(Boolean).join(", ")

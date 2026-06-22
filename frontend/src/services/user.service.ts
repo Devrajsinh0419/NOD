@@ -74,4 +74,11 @@ export const userService = {
     >(`/api/search/users?${params}`);
     return res.data!;
   },
+
+  /** Delete user account */
+  async deleteAccount(userId: number): Promise<void> {
+    await apiFetch(`/api/users/${userId}/profile`, {
+      method: "DELETE",
+    });
+  },
 };

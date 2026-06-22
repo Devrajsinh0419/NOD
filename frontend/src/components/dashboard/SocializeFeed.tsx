@@ -302,6 +302,7 @@ export default function SocializeFeed({ role }: Props) {
                       </div>
                       <div>
                         <h4 className="text-xs font-semibold text-[#F5F0E8] leading-none group-hover:text-[#C9A96E] transition-colors">{post.user.full_name}</h4>
+                        <p className="text-[10px] text-[#8B7355] font-mono mt-0.5">@{post.user.username}</p>
                         <p className="text-[10px] text-[#C9A96E]/60 mt-1 uppercase tracking-wider">{post.user.role}</p>
                       </div>
                     </div>
@@ -439,7 +440,10 @@ export default function SocializeFeed({ role }: Props) {
                               <span>{prof.full_name.charAt(0).toUpperCase()}</span>
                             )}
                           </div>
-                          <span className="text-[#B8A88A] text-[11px] group-hover:text-[#C9A96E] transition-colors">{prof.full_name}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[#B8A88A] text-[11px] group-hover:text-[#C9A96E] transition-colors font-medium">{prof.full_name}</span>
+                            <span className="text-[#8B7355] text-[9px] font-mono leading-none">@{prof.username}</span>
+                          </div>
                         </div>
                         <span className="text-[10px] text-[#8AA86E] uppercase shrink-0">{prof.role}</span>
                       </li>

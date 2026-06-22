@@ -120,4 +120,20 @@ export const authService = {
       body: JSON.stringify(data),
     });
   },
+
+  /** Send OTP to email/phone */
+  async sendOtp(email: string, phoneNumber: string, purpose: string = "signup"): Promise<ApiResponse<any>> {
+    return await apiFetch<ApiResponse<any>>("/api/accounts/send-otp/", {
+      method: "POST",
+      body: JSON.stringify({ email, phone_number: phoneNumber, purpose }),
+    });
+  },
+
+  /** Verify OTP */
+  async verifyOtp(phoneNumber: string, otpCode: string, purpose: string = "signup"): Promise<ApiResponse<any>> {
+    return await apiFetch<ApiResponse<any>>("/api/accounts/verify-otp/", {
+      method: "POST",
+      body: JSON.stringify({ phone_number: phoneNumber, otp_code: otpCode, purpose }),
+    });
+  },
 };
