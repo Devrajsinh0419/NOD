@@ -41,7 +41,7 @@ const projects = [
 
 export default function FeaturedProjects() {
   return (
-    <section id="projects" className="px-6 py-24">
+    <section id="projects" className="px-4 md:px-6 py-12 md:py-24">
 
       {/* TOP LINE */}
       <div className="mb-6 h-px w-full bg-[#C9A96E]/10" />
@@ -55,7 +55,7 @@ export default function FeaturedProjects() {
             Featured Work
           </p>
 
-          <h2 className="text-5xl font-light text-[#F5F0E8]">
+          <h2 className="text-3xl md:text-5xl font-light text-[#F5F0E8] leading-tight">
             Selected Projects Across India
           </h2>
 

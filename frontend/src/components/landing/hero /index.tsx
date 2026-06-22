@@ -49,26 +49,26 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="relative z-10 mx-auto max-w-4xl px-6 text-center"
+          className="relative z-10 mx-auto max-w-4xl px-4 md:px-6 text-center"
         >
-          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-[#C9A96E]">
+          <p className="mb-4 text-xs md:text-sm uppercase tracking-[0.3em] text-[#C9A96E]">
             Interior Design Marketplace
           </p>
 
-          <h1 className="text-5xl font-bold leading-tight md:text-7xl text-[#F5F0E8]">
+          <h1 className="text-4xl font-bold leading-tight md:text-7xl text-[#F5F0E8]">
             Crafting Spaces
             <br />
             That <span className="text-[#C9A96E]">Inspire</span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-xl md:text-2xl leading-relaxed text-[#B8A88A]">
+          <p className="mx-auto mt-4 md:mt-6 max-w-2xl text-base md:text-2xl leading-relaxed text-[#B8A88A]">
             Connecting visionary clients with world-class architects,
             designers, and interior professionals.
           </p>
 
-          <div className="mt-10 flex justify-center gap-4">
+          <div className="mt-8 md:mt-10 flex justify-center gap-4">
             <Link href="/login?mode=signup" >
-            <button className="rounded-full border border-[#C9A96E]/30 bg-[#C9A96E]/10 px-10 py-5 text-sm text-[#D4C4A8] backdrop-blur-md transition-all duration-300 hover:bg-[#C9A96E]/25 hover:border-[#C9A96E]/50">
+            <button className="rounded-full border border-[#C9A96E]/30 bg-[#C9A96E]/10 px-6 py-3 md:px-10 md:py-5 text-sm text-[#D4C4A8] backdrop-blur-md transition-all duration-300 hover:bg-[#C9A96E]/25 hover:border-[#C9A96E]/50">
               Get A Quote
             </button>
             </Link>

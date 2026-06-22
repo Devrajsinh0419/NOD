@@ -32,7 +32,7 @@ const steps = [
 
 export default function ProcessSection() {
   return (
-    <section className="px-6 py-24">
+    <section className="px-4 md:px-6 py-12 md:py-24">
 
       {/* TOP LINE */}
       <div className="mb-6 h-px w-full bg-[#C9A96E]/10" />
@@ -46,7 +46,7 @@ export default function ProcessSection() {
             How We Work
           </p>
 
-          <h2 className="text-5xl font-light text-[#F5F0E8]">
+          <h2 className="text-3xl md:text-5xl font-light text-[#F5F0E8] leading-tight">
             From Concept to Completion
           </h2>
 
@@ -59,7 +59,7 @@ export default function ProcessSection() {
 
             <div
               key={index}
-              className="rounded-[1.5rem] border border-[#C9A96E]/10 bg-[#1A1714] p-8 transition-all duration-500 hover:border-[#C9A96E]/20 hover:bg-[#221F1A]"
+              className="rounded-[1.5rem] border border-[#C9A96E]/10 bg-[#1A1714] p-6 md:p-8 transition-all duration-500 hover:border-[#C9A96E]/20 hover:bg-[#221F1A]"
             >
 
               {/* NUMBER */}

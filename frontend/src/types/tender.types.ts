@@ -7,6 +7,13 @@ export interface Tender {
   startDate: string;
   endDate: string;
   source: string;
+  state: string;
+  city: string;
+  category: string;
+  estimatedValue: string;
+  tenderUrl: string;
+  documentUrls: string[];
+  status: string;
 }
 
 export interface TenderStats {

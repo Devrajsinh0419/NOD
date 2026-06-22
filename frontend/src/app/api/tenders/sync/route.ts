@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import { syncGemTenders } from '@/services/gem.service';
+import { syncAllTenders } from '@/services/tender.service';
 
 export async function POST() {
   try {
-    console.log('Manual sync requested via API...');
-    await syncGemTenders();
+    console.log('Manual sync requested via API for all portals...');
+    await syncAllTenders();
     return NextResponse.json({
       success: true,
-      message: 'GeM tender sync completed successfully.'
+      message: 'All government tenders sync completed successfully.'
     });
   } catch (error: any) {
     console.error('Manual sync failed:', error);

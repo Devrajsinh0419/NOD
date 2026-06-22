@@ -33,39 +33,36 @@ import logo from "@/public/images/logo.png"
 
 export default function CTASection() {
   return (
-    <section id="contact" className="pt-24">
+    <section id="contact" className="pt-12 md:pt-24 px-4 md:px-6">
 
       {/* CTA BANNER */}
-      <div className="static-dark relative mx-auto max-w-6xl overflow-hidden rounded-[2rem]">
+      <div className="static-dark relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-[#1A1714] border border-[#C9A96E]/10 py-16 md:py-24 px-6 md:px-12">
 
         {/* BACKGROUND IMAGE */}
-        <div className="relative h-100 w-full">
-
+        <div className="absolute inset-0 z-0">
           <Image
             src="/images/cta-bg.jpg"
             alt="CTA Background"
             fill
-            className="object-cover"
+            className="object-cover opacity-45"
           />
-
           {/* DARK OVERLAY */}
-          <div className="absolute inset-0 bg-black/50" />
-
+          <div className="absolute inset-0 bg-black/60" />
         </div>
 
         {/* CONTENT */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+        <div className="relative z-10 flex flex-col items-center justify-center text-center">
 
-          <h2 className="text-5xl font-light text-[#F5F0E8] md:text-6xl">
+          <h2 className="text-3xl font-light text-[#F5F0E8] md:text-6xl max-w-3xl leading-tight">
             Ready to Build Your Vision?
           </h2>
 
-          <p className="mt-6 max-w-2xl text-lg text-[#B8A88A]">
+          <p className="mt-6 max-w-2xl text-base md:text-lg text-[#B8A88A] leading-relaxed">
             Luxury architectural and interior solutions crafted
             with precision, innovation, and timeless aesthetics.
           </p>
           <Link href="/login?mode=signup">
-            <button className="mt-10 rounded-full bg-linear-to-r from-[#C9A96E] to-[#B8944F] px-8 py-4 text-sm font-medium text-[#0D0D0D] transition-all duration-300 hover:scale-105 shadow-[0_0_25px_rgba(201,169,110,0.2)]">
+            <button className="mt-8 md:mt-10 rounded-full bg-linear-to-r from-[#C9A96E] to-[#B8944F] px-8 py-4 text-sm font-medium text-[#0D0D0D] transition-all duration-300 hover:scale-105 shadow-[0_0_25px_rgba(201,169,110,0.2)]">
               Get in Touch
             </button>
           </Link>
@@ -75,7 +72,7 @@ export default function CTASection() {
       </div>
 
       {/* FOOTER */}
-      <footer className="mt-20 border-t border-[#C9A96E]/8 px-6 py-16">
+      <footer className="mt-20 border-t border-[#C9A96E]/8 px-4 md:px-6 py-16">
         <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-3">
 
           {/* LEFT */}
@@ -105,7 +102,7 @@ export default function CTASection() {
           </div>
 
           {/* CENTER */}
-          <div className="text-center">
+          <div className="text-left md:text-center">
 
             <p className="mb-6 text-xs uppercase tracking-[0.3em] text-[#8B7355]">
               Quick Links
@@ -125,7 +122,7 @@ export default function CTASection() {
           </div>
 
           {/* RIGHT */}
-          <div className="text-right">
+          <div className="text-left md:text-right">
 
             <p className="mb-6 text-xs uppercase tracking-[0.3em] text-[#8B7355]">
               Support
@@ -142,7 +139,7 @@ export default function CTASection() {
             </div>
 
             {/* SOCIALS */}
-            <div className="mt-8 flex justify-end gap-4">
+            <div className="mt-8 flex justify-start md:justify-end gap-4">
               <Link
                 href="https://www.instagram.com/nod._india/"
                 target="_blank"

@@ -235,6 +235,7 @@ function LoginContent() {
   const [otpVerified, setOtpVerified] = useState(false)
   const [otpLoading, setOtpLoading] = useState(false)
   const [otpMessage, setOtpMessage] = useState("")
+  const [debugOtp, setDebugOtp] = useState<string | null>(null)
 
   const handleSendOTP = async () => {
     if (!email.trim() || emailError) {
@@ -254,11 +255,18 @@ function LoginContent() {
       if (response.success) {
         setOtpSent(true)
         setOtpMessage("OTP sent successfully to your email!")
+        if ((response as any).otp_code_debug) {
+          setDebugOtp((response as any).otp_code_debug)
+        } else {
+          setDebugOtp(null)
+        }
       } else {
         setError(response.message || "Failed to send OTP")
+        setDebugOtp(null)
       }
     } catch (err: any) {
       setError(err?.message || "Failed to send OTP. Please check your credentials.")
+      setDebugOtp(null)
     } finally {
       setOtpLoading(false)
     }
@@ -907,7 +915,7 @@ function LoginContent() {
               </div>
 
               {otpSent && !otpVerified && (
-                <div className="group animate-fadeIn">
+                <div className="group animate-fadeIn space-y-3">
                   <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">Enter OTP</label>
                   <div className="flex gap-2">
                     <input
@@ -926,6 +934,20 @@ function LoginContent() {
                       {otpLoading ? "Verifying..." : "Verify OTP"}
                     </button>
                   </div>
+                  {debugOtp && (
+                    <div className="text-[10px] text-yellow-400/80 bg-yellow-400/10 border border-yellow-400/20 p-2.5 rounded-lg flex items-center justify-between gap-2">
+                      <span><strong>[Debug Mode]</strong> Code: <code className="text-white font-mono bg-black/40 px-1.5 py-0.5 rounded text-xs select-all">{debugOtp}</code></span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(debugOtp);
+                        }}
+                        className="text-[#C9A96E] hover:underline uppercase text-[9px] font-bold"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  )}
                   {otpMessage && (
                     <p className="mt-1.5 text-[10px] text-amber-400/70">
                       {otpMessage}

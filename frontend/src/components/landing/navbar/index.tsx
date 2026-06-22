@@ -4,11 +4,12 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import logo from "@/public/images/logo.png"
-
+import { Menu, X } from "lucide-react"
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,7 +50,6 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    // { label: "Home", targetId: "home" },
     { label: "Services", targetId: "services" },
     { label: "Portfolio", targetId: "projects" },
     { label: "About", targetId: "about" },
@@ -58,32 +58,33 @@ export default function Navbar() {
 
   return (
     <header
-      className={`static-dark fixed top-0 left-0 z-50 w-full transition-all duration-300 ${isScrolled
-        ? "bg-black/40 backdrop-blur-md border-b border-[#C9A96E]/10 shadow-lg"
+      className={`static-dark fixed top-0 left-0 z-50 w-full transition-all duration-300 ${isScrolled || mobileMenuOpen
+        ? "bg-black/80 backdrop-blur-md border-b border-[#C9A96E]/10 shadow-lg"
         : "bg-transparent"
         }`}
     >
       <div className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-300 relative z-10 ${isScrolled ? "py-3" : "py-5"
         }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           <Image
             src={logo}
             alt="Logo"
-            className="h-14 w-14"
+            className="h-10 w-10 md:h-14 md:w-14"
           />
 
           <div className="flex items-center">
-            <h1 className="text-7xl font-bold leading-none text-[#F5F0E8]">N</h1>
+            <h1 className="text-3xl md:text-5xl font-bold leading-none text-[#F5F0E8]">N</h1>
 
             <div className="ml-1 leading-none">
-              <p className="text-3xl font-semibold text-[#F5F0E8]">OD</p>
-              <p className="text-xs tracking-[0.3em] text-[#F5F0E8]">
+              <p className="text-lg md:text-2xl font-semibold text-[#F5F0E8]">OD</p>
+              <p className="hidden sm:block text-[8px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] text-[#F5F0E8]/70">
                 IGHT OWL DESIGNERS
               </p>
             </div>
           </div>
         </div>
 
+        {/* Desktop Links */}
         <nav 
           className="hidden gap-8 md:flex text-[#F5F0E8] text-sm"
           onMouseLeave={() => setHoveredItem(null)}
@@ -100,8 +101,10 @@ export default function Navbar() {
             </a>
           ))}
         </nav>
+
+        {/* Desktop Actions */}
         <div 
-          className="flex items-center gap-4"
+          className="hidden md:flex items-center gap-4"
           onMouseLeave={() => setHoveredItem(null)}
         >
           <Link
@@ -121,7 +124,55 @@ export default function Navbar() {
             </button>
           </Link>
         </div>
+
+        {/* Mobile menu toggle */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="flex items-center justify-center p-2 text-[#F5F0E8] hover:text-[#C9A96E] transition-colors md:hidden"
+          aria-label="Toggle Menu"
+        >
+          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
+
+      {/* Mobile Drawer Dropdown */}
+      {mobileMenuOpen && (
+        <div className="absolute top-full left-0 z-40 w-full bg-[#0D0D0D]/95 backdrop-blur-lg border-b border-[#C9A96E]/15 px-6 py-8 flex flex-col gap-6 md:hidden animate-fadeIn">
+          <nav className="flex flex-col gap-4 text-[#F5F0E8] text-base">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={`#${link.targetId}`}
+                className="hover:text-[#C9A96E] transition-colors py-2 border-b border-white/5"
+                onClick={(e) => {
+                  handleNavClick(e, link.targetId)
+                  setMobileMenuOpen(false)
+                }}
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+          <div className="flex flex-col gap-3 pt-4 border-t border-[#C9A96E]/10">
+            <Link
+              href="/login?mode=signin"
+              className="text-center text-[#F5F0E8] hover:text-[#C9A96E] py-2.5 transition-colors text-sm font-medium border border-white/10 rounded-full"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
+            <Link
+              href="/login?mode=signup"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full"
+            >
+              <button className="w-full rounded-full border border-[#C9A96E]/30 bg-[#C9A96E]/10 py-3 text-sm text-[#C9A96E] hover:bg-[#C9A96E]/20 transition-colors">
+                Sign Up
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

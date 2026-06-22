@@ -25,17 +25,45 @@ export async function initializeDatabase() {
         start_date TIMESTAMP,
         end_date TIMESTAMP,
         source VARCHAR(50) DEFAULT 'GeM',
+        state VARCHAR(100),
+        city VARCHAR(100),
+        category VARCHAR(100),
+        estimated_value VARCHAR(100),
+        tender_url TEXT,
+        document_urls TEXT,
+        status VARCHAR(50) DEFAULT 'active',
         created_at TIMESTAMP DEFAULT NOW()
       );
     `);
     
-    // Create an index on search fields for better performance
+    // Add columns dynamically in case table already exists
     await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_tenders_search 
-      ON tenders (title, ministry, department);
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS state VARCHAR(100);
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS city VARCHAR(100);
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS estimated_value VARCHAR(100);
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS tender_url TEXT;
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS document_urls TEXT;
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS ministry VARCHAR(200);
+    `);
+
+    // Create unique constraint to prevent duplicates
+    await client.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_tenders_source_bid_number ON tenders (source, bid_number);
     `);
     
-    console.log('PostgreSQL Database initialized successfully (tenders table exists).');
+    // Create indices for search, sorting, and filtering
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_tenders_search ON tenders (title, ministry, department);
+      CREATE INDEX IF NOT EXISTS idx_tenders_state ON tenders (state);
+      CREATE INDEX IF NOT EXISTS idx_tenders_source ON tenders (source);
+      CREATE INDEX IF NOT EXISTS idx_tenders_category ON tenders (category);
+      CREATE INDEX IF NOT EXISTS idx_tenders_end_date ON tenders (end_date);
+      CREATE INDEX IF NOT EXISTS idx_tenders_estimated_value ON tenders (estimated_value);
+    `);
+    
+    console.log('PostgreSQL Database initialized successfully (tenders table and indexes verified).');
   } catch (error) {
     console.error('Error initializing PostgreSQL Database:', error);
     throw error;
