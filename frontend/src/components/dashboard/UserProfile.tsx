@@ -157,13 +157,13 @@ export default function UserProfile({ role }: Props) {
     try {
       const userObj = authService.getStoredUser()
       if (!userObj) return
-      
+
       await userService.deleteAccount(userObj.id)
-      
+
       localStorage.removeItem("nod_user")
       localStorage.removeItem("nod_token")
       window.dispatchEvent(new Event("storage"))
-      
+
       setShowDeleteModal(false)
       router.push("/login")
     } catch (err) {
@@ -515,7 +515,7 @@ export default function UserProfile({ role }: Props) {
             {skillTags.map((tag: string, i: number) => (
               <span
                 key={i}
-                className="px-3 py-1.5 rounded-lg border border-[#C9A96E]/60 bg-[#C9A96E]/3 text-[11px] text-[#F5F0E8]/90"
+                className="px-3 py-1.5 rounded-lg border border-[#C9A96E]/60 bg-[#C9A96E]/3 text-[11px] text-black/90"
               >
                 {tag}
               </span>
@@ -749,7 +749,7 @@ export default function UserProfile({ role }: Props) {
               Are you absolutely sure you want to delete your account? This action is permanent and cannot be undone. All your projects, bids, and profile details will be permanently removed.
             </p>
           </div>
-          
+
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-[#C9A96E]/6">
             <button
               type="button"
