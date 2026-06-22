@@ -462,8 +462,8 @@ export async function saveTendersToDb(tenders: NormalizedTender[]): Promise<void
     await client.query('BEGIN');
     
     const queryText = `
-      INSERT INTO tenders (id, bid_number, title, ministry, department, start_date, end_date, source, state, city, category, estimated_value, tender_url, document_urls, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      INSERT INTO tenders (id, bid_number, title, ministry, department, start_date, end_date, source, state, city, category, estimated_value, estimated_value_numeric, tender_url, document_urls, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       ON CONFLICT (source, bid_number) 
       DO UPDATE SET 
         title = EXCLUDED.title,
@@ -475,11 +475,19 @@ export async function saveTendersToDb(tenders: NormalizedTender[]): Promise<void
         city = EXCLUDED.city,
         category = EXCLUDED.category,
         estimated_value = EXCLUDED.estimated_value,
+        estimated_value_numeric = EXCLUDED.estimated_value_numeric,
         tender_url = EXCLUDED.tender_url,
         document_urls = EXCLUDED.document_urls,
         status = EXCLUDED.status,
         created_at = NOW()
     `;
+
+    const parseNumericValue = (valStr: string): number => {
+      if (!valStr) return 0;
+      const cleaned = valStr.replace(/[^0-9.]/g, '');
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
+    };
 
     for (const tender of tenders) {
       const parsedId = parseInt(tender.id);
@@ -487,6 +495,7 @@ export async function saveTendersToDb(tenders: NormalizedTender[]): Promise<void
       const parsedStartDate = parseSafeDate(tender.startDate);
       const parsedEndDate = parseSafeDate(tender.endDate);
       const docUrlsStr = Array.isArray(tender.documentUrls) ? JSON.stringify(tender.documentUrls) : String(tender.documentUrls || '[]');
+      const numericVal = parseNumericValue(tender.estimatedValue);
       
       await client.query(queryText, [
         id,
@@ -501,6 +510,7 @@ export async function saveTendersToDb(tenders: NormalizedTender[]): Promise<void
         tender.city,
         tender.category,
         tender.estimatedValue,
+        numericVal,
         tender.tenderUrl,
         docUrlsStr,
         tender.status

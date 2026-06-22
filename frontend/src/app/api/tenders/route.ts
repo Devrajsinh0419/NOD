@@ -126,8 +126,8 @@ export async function GET(request: Request) {
     if (budgetMin) {
       const minVal = parseFloat(budgetMin.replace(/[^0-9.]/g, ''));
       if (!isNaN(minVal)) {
-        queryText += ` AND CAST(regexp_replace(estimated_value, '[^0-9]', '', 'g') AS NUMERIC) >= $${paramIndex}`;
-        countQueryText += ` AND CAST(regexp_replace(estimated_value, '[^0-9]', '', 'g') AS NUMERIC) >= $${paramIndex}`;
+        queryText += ` AND estimated_value_numeric >= $${paramIndex}`;
+        countQueryText += ` AND estimated_value_numeric >= $${paramIndex}`;
         queryParams.push(minVal);
         paramIndex++;
       }
@@ -137,8 +137,8 @@ export async function GET(request: Request) {
     if (budgetMax) {
       const maxVal = parseFloat(budgetMax.replace(/[^0-9.]/g, ''));
       if (!isNaN(maxVal)) {
-        queryText += ` AND CAST(regexp_replace(estimated_value, '[^0-9]', '', 'g') AS NUMERIC) <= $${paramIndex}`;
-        countQueryText += ` AND CAST(regexp_replace(estimated_value, '[^0-9]', '', 'g') AS NUMERIC) <= $${paramIndex}`;
+        queryText += ` AND estimated_value_numeric <= $${paramIndex}`;
+        countQueryText += ` AND estimated_value_numeric <= $${paramIndex}`;
         queryParams.push(maxVal);
         paramIndex++;
       }

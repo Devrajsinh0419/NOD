@@ -82,6 +82,8 @@ export default function FeaturedProjects() {
                 alt={project.title}
                 fill
                 className="object-cover transition-all duration-700 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                loading="lazy"
               />
 
               {/* OVERLAY */}

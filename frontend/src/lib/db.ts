@@ -32,7 +32,7 @@ export async function initializeDatabase() {
   try {
     // Fast path: Check if table exists and has all required columns
     try {
-      await client.query('SELECT id, state, city, category, estimated_value, tender_url, document_urls, status, ministry FROM tenders LIMIT 1');
+      await client.query('SELECT id, state, city, category, estimated_value, estimated_value_numeric, tender_url, document_urls, status, ministry FROM tenders LIMIT 1');
       console.log('PostgreSQL Database tenders table is already initialized and matches schema. Skipping updates.');
       isInitialized = true;
       return;
@@ -55,6 +55,7 @@ export async function initializeDatabase() {
         city VARCHAR(100),
         category VARCHAR(100),
         estimated_value VARCHAR(100),
+        estimated_value_numeric NUMERIC,
         tender_url TEXT,
         document_urls TEXT,
         status VARCHAR(50) DEFAULT 'active',
@@ -68,6 +69,7 @@ export async function initializeDatabase() {
       ALTER TABLE tenders ADD COLUMN IF NOT EXISTS city VARCHAR(100);
       ALTER TABLE tenders ADD COLUMN IF NOT EXISTS category VARCHAR(100);
       ALTER TABLE tenders ADD COLUMN IF NOT EXISTS estimated_value VARCHAR(100);
+      ALTER TABLE tenders ADD COLUMN IF NOT EXISTS estimated_value_numeric NUMERIC;
       ALTER TABLE tenders ADD COLUMN IF NOT EXISTS tender_url TEXT;
       ALTER TABLE tenders ADD COLUMN IF NOT EXISTS document_urls TEXT;
       ALTER TABLE tenders ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
@@ -87,6 +89,7 @@ export async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_tenders_category ON tenders (category);
       CREATE INDEX IF NOT EXISTS idx_tenders_end_date ON tenders (end_date);
       CREATE INDEX IF NOT EXISTS idx_tenders_estimated_value ON tenders (estimated_value);
+      CREATE INDEX IF NOT EXISTS idx_tenders_estimated_value_numeric ON tenders (estimated_value_numeric);
     `);
     
     isInitialized = true;

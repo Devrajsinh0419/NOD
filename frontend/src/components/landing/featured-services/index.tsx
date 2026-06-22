@@ -114,6 +114,8 @@ export default function DesignsSection() {
                     width={400}
                     height={300}
                     className="h-48 md:h-72 w-full object-cover transition-all duration-500 group-hover/card:scale-110"
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    loading="lazy"
                   />
 
                   {/* DARK OVERLAY */}

@@ -1,14 +1,28 @@
 import "./globals.css"
+import dynamic from "next/dynamic"
 import Navbar from "@/components/landing/navbar"
 import HeroSection from "@/components/landing/hero "
-import FeaturedServices from "@/components/landing/featured-services"
-import AboutSection from "@/components/landing/about/index"
-import FeaturedProjects from "@/components/landing/featured-projects"
-import ProcessSection from "@/components/landing/process-section"
 import Marque from "@/components/landing/marque/page"
-// import DesignersSection from "@/components/landing/designer-section "
-import CTASection from "@/components/landing/cta"
-import ChatWidget from "@/components/chat/ChatWidget"
+
+// Dynamically import below-the-fold components with SSR enabled
+const FeaturedServices = dynamic(() => import("@/components/landing/featured-services"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+})
+const FeaturedProjects = dynamic(() => import("@/components/landing/featured-projects"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+})
+const AboutSection = dynamic(() => import("@/components/landing/about/index"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+})
+const ProcessSection = dynamic(() => import("@/components/landing/process-section"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+})
+const CTASection = dynamic(() => import("@/components/landing/cta"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+})
+
+// Client-only component (ChatWidget) dynamically loaded without SSR
+const ChatWidget = dynamic(() => import("@/components/chat/ChatWidget"), { ssr: false })
 
 export default function Home() {
   return (
@@ -19,7 +33,6 @@ export default function Home() {
       <FeaturedServices />
       <FeaturedProjects />
       <AboutSection />
-      {/* <DesignersSection /> */}
       <ProcessSection />
       <CTASection />
       <ChatWidget />

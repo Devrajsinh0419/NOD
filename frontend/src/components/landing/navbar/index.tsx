@@ -70,6 +70,7 @@ export default function Navbar() {
             src={logo}
             alt="Logo"
             className="h-10 w-10 md:h-14 md:w-14"
+            priority
           />
 
           <div className="flex items-center">

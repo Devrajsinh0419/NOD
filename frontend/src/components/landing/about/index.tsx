@@ -31,6 +31,8 @@ export default function AboutFounder() {
               alt="Founder"
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, 300px"
+              loading="lazy"
             />
 
           </div>

@@ -4,6 +4,8 @@ import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 
+import Image from "next/image"
+
 export default function HeroSection() {
 
   const images = [
@@ -31,13 +33,19 @@ export default function HeroSection() {
         {images.map((image, index) => (
         <div
           key={index}
-          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
+          className={`absolute inset-0 transition-opacity duration-1000 ${
           index === currentImage ? "opacity-100" : "opacity-0"
           }`}
-          style={{
-          backgroundImage: `url(${image})`,
-          }}
-        />
+        >
+          <Image
+            src={image}
+            alt={`Hero Slide ${index + 1}`}
+            fill
+            priority={index === 0}
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
         ))}
       </div>
 

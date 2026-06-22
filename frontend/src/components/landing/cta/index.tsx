@@ -45,6 +45,8 @@ export default function CTASection() {
             alt="CTA Background"
             fill
             className="object-cover opacity-45"
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            loading="lazy"
           />
           {/* DARK OVERLAY */}
           <div className="absolute inset-0 bg-black/60" />
