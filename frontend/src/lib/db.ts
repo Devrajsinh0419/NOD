@@ -23,9 +23,23 @@ const pool = new Pool(
       }
 );
 
+let isInitialized = false;
+
 export async function initializeDatabase() {
+  if (isInitialized) return;
+
   const client = await pool.connect();
   try {
+    // Fast path: Check if table exists and has all required columns
+    try {
+      await client.query('SELECT id, state, city, category, estimated_value, tender_url, document_urls, status, ministry FROM tenders LIMIT 1');
+      console.log('PostgreSQL Database tenders table is already initialized and matches schema. Skipping updates.');
+      isInitialized = true;
+      return;
+    } catch (checkErr) {
+      console.log('Tenders table check failed or incomplete. Proceeding with database schema initialization...');
+    }
+
     // Create tenders table if not exists
     await client.query(`
       CREATE TABLE IF NOT EXISTS tenders (
@@ -75,6 +89,7 @@ export async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS idx_tenders_estimated_value ON tenders (estimated_value);
     `);
     
+    isInitialized = true;
     console.log('PostgreSQL Database initialized successfully (tenders table and indexes verified).');
   } catch (error) {
     console.error('Error initializing PostgreSQL Database:', error);

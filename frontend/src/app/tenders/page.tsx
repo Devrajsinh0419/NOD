@@ -652,7 +652,7 @@ export default function TendersPage() {
                     "Tamil Nadu Tenders", "Kerala eTender", "ONGC Tenders",
                     "NTPC Tenders", "Coal India Tenders", "BHEL Tenders", "NPCIL Tenders"
                   ].map(src => (
-                    <label key={src} className="flex items-center gap-2 text-xs text-[#F5F0E8]/80 cursor-pointer">
+                    <label key={src} className="flex items-center gap-2 text-xs text-black/80 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={sourceFilter.includes(src)}
