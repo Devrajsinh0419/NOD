@@ -23,11 +23,10 @@ export default function Navbar() {
   const getLinkClass = (id: string) => {
     const isAnyHovered = hoveredItem !== null
     const isSelfHovered = hoveredItem === id
-    return `transition-all duration-300 ${
-      isAnyHovered && !isSelfHovered
-        ? "opacity-30 blur-[0.5px]"
-        : "opacity-100"
-    }`
+    return `transition-all duration-300 ${isAnyHovered && !isSelfHovered
+      ? "opacity-30 blur-[0.5px]"
+      : "opacity-100"
+      }`
   }
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
@@ -51,9 +50,6 @@ export default function Navbar() {
 
   const navLinks = [
     { label: "Services", href: "#services", isHash: true },
-    { label: "Portfolio", href: "#projects", isHash: true },
-    { label: "Tenders", href: "/tenders", isHash: false },
-    { label: "Designers", href: "/public/marketplace/designers", isHash: false },
     { label: "Projects", href: "/public/marketplace/projects", isHash: false },
     { label: "About", href: "#about", isHash: true },
     { label: "Contact", href: "#contact", isHash: true },
@@ -89,7 +85,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Links */}
-        <nav 
+        <nav
           className="hidden gap-6 lg:gap-8 md:flex text-[#F5F0E8] text-sm"
           onMouseLeave={() => setHoveredItem(null)}
         >
@@ -118,7 +114,7 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop Actions */}
-        <div 
+        <div
           className="hidden md:flex items-center gap-4"
           onMouseLeave={() => setHoveredItem(null)}
         >
