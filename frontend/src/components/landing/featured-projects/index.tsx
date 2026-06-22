@@ -4,35 +4,35 @@ import Image from "next/image"
 
 const projects = [
   {
-    image: "/images/p1.png",
+    image: "/images/p1.webp",
     title: "Modern Villa",
     category: "Interior Design",
     className: "md:col-span-2 md:row-span-1",
   },
 
   {
-    image: "/images/p2.png",
+    image: "/images/p2.webp",
     title: "Serene Living",
     category: "Luxury Interior",
     className: "md:col-span-1 md:row-span-1",
   },
 
   {
-    image: "/images/p3.png",
+    image: "/images/p3.webp",
     title: "Urban Residence",
     category: "Exterior Design",
     className: "md:col-span-2 md:row-span-1",
   },
 
   {
-    image: "/images/p4.png",
+    image: "/images/p4.webp",
     title: "Ambient Lounge",
     category: "Interior Space",
     className: "md:col-span-1 md:row-span-1",
   },
 
   {
-    image: "/images/p5.png",
+    image: "/images/p5.webp",
     title: "Skyline Apartment",
     category: "Modern Living",
     className: "md:col-span-3 md:row-span-1",

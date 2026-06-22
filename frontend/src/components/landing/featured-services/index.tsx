@@ -14,15 +14,15 @@ export default function DesignsSection() {
       cards: [
         {
           title: "Interior",
-          image: "/images/interior.png",
+          image: "/images/interior.webp",
         },
         {
           title: "Exterior",
-          image: "/images/exterior.png",
+          image: "/images/exterior.webp",
         },
         {
           title: "2D/3D",
-          image: "/images/floorplan.png",
+          image: "/images/floorplan.webp",
         },
       ],
     },
@@ -35,15 +35,15 @@ export default function DesignsSection() {
       cards: [
         {
           title: "Renovation",
-          image: "/images/reno.png",
+          image: "/images/reno.webp",
         },
         {
           title: "Civil Construction",
-          image: "/images/civil.png",
+          image: "/images/civil.webp",
         },
         {
           title: "Structural Planning",
-          image: "/images/structure.png",
+          image: "/images/structure.webp",
         },
       ],
     },
@@ -56,15 +56,15 @@ export default function DesignsSection() {
       cards: [
         {
           title: "AutoCAD Drafting",
-          image: "/images/autocad.png",
+          image: "/images/autocad.webp",
         },
         {
           title: "Vastu Consultation",
-          image: "/images/vastu.png",
+          image: "/images/vastu.webp",
         },
         {
           title: "Project Planning",
-          image: "/images/project.png",
+          image: "/images/project.webp",
         },
       ],
     },

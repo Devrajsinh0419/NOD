@@ -9,10 +9,10 @@ import Image from "next/image"
 export default function HeroSection() {
 
   const images = [
-    "/images/hero1.png",
-    "/images/hero2.png",
-    "/images/hero3.png",
-    "/images/hero4.png",
+    "/images/hero1.webp",
+    "/images/hero2.webp",
+    "/images/hero3.webp",
+    "/images/hero4.webp",
   ]
 
   const [currentImage, setCurrentImage] = useState(0)

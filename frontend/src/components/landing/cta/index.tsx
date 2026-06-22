@@ -41,7 +41,7 @@ export default function CTASection() {
         {/* BACKGROUND IMAGE */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/cta-bg.jpg"
+            src="/images/cta-bg.webp"
             alt="Night Owl Designers Architectural Workspace Background"
             fill
             className="object-cover opacity-45"
