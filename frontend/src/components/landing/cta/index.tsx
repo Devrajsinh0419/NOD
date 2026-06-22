@@ -42,7 +42,7 @@ export default function CTASection() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/cta-bg.jpg"
-            alt="CTA Background"
+            alt="Night Owl Designers Architectural Workspace Background"
             fill
             className="object-cover opacity-45"
             sizes="(max-width: 1200px) 100vw, 1200px"
@@ -84,7 +84,7 @@ export default function CTASection() {
 
               <Image
                 src={logo}
-                alt="Logo"
+                alt="Night Owl Designers (NOD) Logo"
                 width={55}
                 height={55}
                 className="rounded-full"

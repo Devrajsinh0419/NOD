@@ -28,7 +28,7 @@ export default function AboutFounder() {
 
             <Image
               src="/images/founder.png"
-              alt="Founder"
+              alt="Govind Shukla - Founder of Night Owl Designers (NOD)"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 300px"
