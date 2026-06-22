@@ -21,8 +21,8 @@ const CTASection = dynamic(() => import("@/components/landing/cta"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
 })
 
-// Client-only component (ChatWidget) dynamically loaded without SSR
-const ChatWidget = dynamic(() => import("@/components/chat/ChatWidget"), { ssr: false })
+// Client-only component (ChatWidget) dynamically loaded
+const ChatWidget = dynamic(() => import("@/components/chat/ChatWidget"))
 
 export default function Home() {
   return (
