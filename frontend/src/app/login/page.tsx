@@ -639,7 +639,7 @@ function LoginContent() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url(/images/login-background.jpg)",
+              "url(/images/login-background.webp)",
           }}
         />
         <div className="absolute inset-0 bg-linear-to-r from-black/60 via-black/30 to-black/70" />
