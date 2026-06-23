@@ -120,6 +120,7 @@ export default function Navbar() {
         >
           <Link
             href="/login?mode=signin"
+            prefetch={false}
             className={`${getLinkClass("login")} text-[#F5F0E8] hover:text-[#C9A96E] transition-colors text-sm`}
             onMouseEnter={() => setHoveredItem("login")}
           >
@@ -127,6 +128,7 @@ export default function Navbar() {
           </Link>
           <Link
             href="/login?mode=signup"
+            prefetch={false}
             className={getLinkClass("signup")}
             onMouseEnter={() => setHoveredItem("signup")}
           >
@@ -178,6 +180,7 @@ export default function Navbar() {
           <div className="flex flex-col gap-3 pt-4 border-t border-[#C9A96E]/10">
             <Link
               href="/login?mode=signin"
+              prefetch={false}
               className="text-center text-[#F5F0E8] hover:text-[#C9A96E] py-2.5 transition-colors text-sm font-medium border border-white/10 rounded-full"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -185,6 +188,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/login?mode=signup"
+              prefetch={false}
               onClick={() => setMobileMenuOpen(false)}
               className="w-full"
             >

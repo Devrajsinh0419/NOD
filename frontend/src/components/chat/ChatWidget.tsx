@@ -42,13 +42,18 @@ export default function ChatWidget() {
     }
   }, [messages, isLoading, isOpen])
 
+  const [mounted, setMounted] = useState(false)
+
   // Hide the initial launcher greeting tooltip after 8 seconds
   useEffect(() => {
+    setMounted(true)
     const timer = setTimeout(() => {
       setShowTooltip(false)
     }, 8000)
     return () => clearTimeout(timer)
   }, [])
+
+  if (!mounted) return null
 
   // Send a message to the backend API route
   const handleSendMessage = async (text: string) => {

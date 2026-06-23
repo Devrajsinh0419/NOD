@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/dist/client/link";
+import Link from "next/link";
 import Image from "next/image"
 
 export default function DesignsSection() {
@@ -99,42 +99,42 @@ export default function DesignsSection() {
             {/* CARDS */}
             <Link href="/login?mode=signup" className="col-span-3">
               <div className="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-              
-              {section.cards.map((card, i) => (
 
-                <div
-                  key={i}
-                  className="group/card relative cursor-pointer overflow-hidden rounded-[1.5rem]"
-                >
+                {section.cards.map((card, i) => (
 
-                  {/* IMAGE */}
-                  <Image
-                    src={card.image}
-                    alt={card.title}
-                    width={400}
-                    height={300}
-                    className="h-48 md:h-72 w-full object-cover transition-all duration-500 group-hover/card:scale-110"
-                    sizes="(max-width: 768px) 100vw, 400px"
-                    loading="lazy"
-                  />
+                  <div
+                    key={i}
+                    className="group/card relative cursor-pointer overflow-hidden rounded-[1.5rem]"
+                  >
 
-                  {/* DARK OVERLAY */}
-                  <div className="absolute inset-0 bg-black/20 transition-all duration-500 group-hover/card:bg-black/50" />
+                    {/* IMAGE */}
+                    <Image
+                      src={card.image}
+                      alt={card.title}
+                      width={400}
+                      height={300}
+                      className="h-48 md:h-72 w-full object-cover transition-all duration-500 group-hover/card:scale-110"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                      loading="lazy"
+                    />
 
-                  {/* TEXT */}
-                  <div className="absolute inset-0 flex items-center justify-center">
+                    {/* DARK OVERLAY */}
+                    <div className="absolute inset-0 bg-black/20 transition-all duration-500 group-hover/card:bg-black/50" />
 
-                    <h3 className="translate-y-6 md:translate-y-10 text-xl md:text-4xl font-light text-white opacity-0 transition-all duration-500 group-hover/card:translate-y-0 group-hover/card:opacity-100">
-                      {card.title}
-                    </h3>
+                    {/* TEXT */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+
+                      <h3 className="translate-y-6 md:translate-y-10 text-xl md:text-4xl font-light text-white opacity-0 transition-all duration-500 group-hover/card:translate-y-0 group-hover/card:opacity-100">
+                        {card.title}
+                      </h3>
+
+                    </div>
 
                   </div>
 
-                </div>
+                ))}
 
-              ))}
-              
-            </div>
+              </div>
             </Link>
 
           </div>

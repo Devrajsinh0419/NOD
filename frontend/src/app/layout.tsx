@@ -1,5 +1,20 @@
+import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import { Metadata } from 'next'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+})
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-cormorant',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -65,7 +80,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://nominatim.openstreetmap.org" />
+        <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org" />
+      </head>
       <body>{children}</body>
     </html>
   )

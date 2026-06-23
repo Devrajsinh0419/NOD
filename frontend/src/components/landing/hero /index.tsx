@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 
@@ -16,8 +15,10 @@ export default function HeroSection() {
   ]
 
   const [currentImage, setCurrentImage] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % images.length)
     }, 5000) // change every 5 seconds
@@ -30,33 +31,33 @@ export default function HeroSection() {
 
       {/* Background Image */}
       <div className="absolute inset-0">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0"
-              }`}
-          >
-            <Image
-              src={image}
-              alt={`Hero Slide ${index + 1}`}
-              fill
-              priority={index === 0}
-              sizes="100vw"
-              className="object-cover"
-            />
-          </div>
-        ))}
+        {images.map((image, index) => {
+          if (index !== 0 && !mounted) return null
+          return (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0"
+                }`}
+            >
+              <Image
+                src={image}
+                alt={`Hero Slide ${index + 1}`}
+                fill
+                priority={index === 0}
+                sizes="100vw"
+                className="object-cover"
+              />
+            </div>
+          )
+        })}
       </div>
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Content */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        className="relative z-10 mx-auto max-w-4xl px-4 md:px-6 text-center"
+      <div
+        className="relative z-10 mx-auto max-w-4xl px-4 md:px-6 text-center animate-fadeInUp"
       >
         <p className="mb-4 text-xs md:text-sm uppercase tracking-[0.3em] text-[#C9A96E]">
           Interior Design Marketplace
@@ -80,7 +81,7 @@ export default function HeroSection() {
             </button>
           </Link>
         </div>
-      </motion.div>
+      </div>
 
     </section>
   )

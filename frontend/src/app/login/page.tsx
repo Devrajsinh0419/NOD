@@ -7,8 +7,6 @@ import logo from "@/public/images/logo.png"
 import { authService } from "@/services/auth.service"
 import { getNames, getCode } from "country-list"
 import countryToCurrency from "country-to-currency"
-import { signInWithPopup } from "firebase/auth"
-import { auth, googleProvider } from "@/lib/firebase"
 import "../globals.css"
 
 // ─── Validation helpers ──────────────────────────────────────────────────────
@@ -576,6 +574,12 @@ function LoginContent() {
     setError("")
     setLoading(true)
     try {
+      const { signInWithPopup } = await import("firebase/auth")
+      const { getFirebase } = await import("@/lib/firebase")
+      const { auth, googleProvider } = await getFirebase()
+      if (!auth || !googleProvider) {
+        throw new Error("Google authentication is currently unavailable.")
+      }
       const result = await signInWithPopup(auth, googleProvider)
       const firebaseUser = result.user
       const idToken = await firebaseUser.getIdToken()
