@@ -159,5 +159,86 @@ const getMediaUrl = (path: string | null | undefined): string => {
   return `${API_BASE}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
-export { apiFetch, API_BASE, getMediaUrl };
+const PRIVATE_FOLDERS = [
+  "coa_licenses",
+  "client_govt_ids",
+  "client_proofs",
+  "client_references",
+  "designer_certificates",
+  "designer_govt_ids",
+  "contractor_ids",
+  "contractor_licenses",
+  "contractor_gst",
+  "contractor_proofs",
+  "chat_attachments",
+  "reference_files",
+  "government_official_ids",
+  "appointment_letters",
+  "tender_",
+  "govt_ids",
+  "project_files",
+  "bid_documents",
+  "project_messages",
+  "wallet_documents",
+  "verification_files",
+  "private_media"
+];
+
+const isPrivateFileUrl = (url: string | null | undefined): boolean => {
+  if (!url) return false;
+  const lowerUrl = url.toLowerCase();
+  return PRIVATE_FOLDERS.some(folder => lowerUrl.includes(folder.toLowerCase()));
+};
+
+const downloadSecureFile = async (filePath: string): Promise<void> => {
+  const match = filePath.match(/([a-f0-9\-]{36})/i);
+  if (!match) {
+    throw new Error("Invalid file path format: no UUID found.");
+  }
+  const uuid = match[1];
+  const token = typeof window !== "undefined" ? localStorage.getItem("nod_token") : null;
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE}/api/files/${uuid}/download`, {
+    headers,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Download failed with status ${response.status}`);
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+
+  // Try to get filename from Content-Disposition header
+  const contentDisposition = response.headers.get("content-disposition");
+  let filename = `download-${uuid}`;
+  if (contentDisposition) {
+    const filenameMatch = contentDisposition.match(/filename="?([^";]+)"?/);
+    if (filenameMatch && filenameMatch[1]) {
+      filename = filenameMatch[1];
+    }
+  } else {
+    // Fallback to path extension if available
+    const pathParts = filePath.split("/");
+    const lastPart = pathParts[pathParts.length - 1];
+    if (lastPart && lastPart.includes(".")) {
+      filename = lastPart;
+    }
+  }
+
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+};
+
+export { apiFetch, API_BASE, getMediaUrl, isPrivateFileUrl, downloadSecureFile };
+
 
