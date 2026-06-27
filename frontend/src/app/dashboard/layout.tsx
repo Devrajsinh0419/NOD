@@ -28,6 +28,7 @@ const clientItems = [
   { label: "Chat", href: "/dashboard/client/chat" },
   { label: "Wallet", href: "/dashboard/client/wallet" },
   { label: "Profile", href: "/dashboard/client/profile" },
+  { label: "Security & Sessions", href: "/dashboard/security" },
 ]
 
 const buildProfessionalItems = (role: string) => [
@@ -39,11 +40,13 @@ const buildProfessionalItems = (role: string) => [
   { label: "Chat", href: `/dashboard/${role}/chat` },
   { label: "Wallet", href: `/dashboard/${role}/wallet` },
   { label: "Profile", href: `/dashboard/${role}/profile` },
+  { label: "Security & Sessions", href: "/dashboard/security" },
 ]
 
 const adminItems = [
   { label: "Overview & Moderation", href: "/dashboard/admin" },
   { label: "Profile", href: "/dashboard/admin/profile" },
+  { label: "Security & Sessions", href: "/dashboard/security" },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -310,6 +313,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className="w-full text-left px-4 py-2 text-sm text-black/80 hover:text-black hover:bg-white/5 transition-colors"
                 >
                   Profile
+                </button>
+                <button
+                  onClick={() => { router.push("/dashboard/security"); setShowDropdown(false) }}
+                  className="w-full text-left px-4 py-2 text-sm text-black/80 hover:text-black hover:bg-white/5 transition-colors"
+                >
+                  Security & Sessions
                 </button>
                 <button
                   onClick={handleLogout}

@@ -14,11 +14,14 @@ const USER_KEY = "nod_user";
 export const authService = {
   /** Login with email + password */
   async login(data: LoginRequest): Promise<{ user: User; token: string }> {
+    const { encryptSensitiveField } = await import("@/utils/crypto");
+    const encryptedPassword = await encryptSensitiveField(data.password);
+
     const res = await apiFetch<AuthResponse>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify({
         username: data.email,
-        password: data.password,
+        password: encryptedPassword,
       }),
     });
 
@@ -32,10 +35,10 @@ export const authService = {
   },
 
   /** Login with Google Firebase ID token */
-  async loginWithGoogle(idToken: string, role: string): Promise<{ user: User; token: string }> {
+  async loginWithGoogle(idToken: string, role: string, registrationData?: any): Promise<{ user: User; token: string }> {
     const res = await apiFetch<AuthResponse>("/api/auth/google", {
       method: "POST",
-      body: JSON.stringify({ id_token: idToken, role }),
+      body: JSON.stringify({ id_token: idToken, role, ...registrationData }),
     });
 
     if (!res.data) throw new Error("No data in response");
@@ -51,9 +54,15 @@ export const authService = {
   async register(
     data: RegisterRequest
   ): Promise<{ user: User; token: string }> {
+    const { encryptSensitiveField } = await import("@/utils/crypto");
+    const encryptedPassword = data.password ? await encryptSensitiveField(data.password) : undefined;
+
     const res = await apiFetch<AuthResponse>("/api/auth/register", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        password: encryptedPassword,
+      }),
     });
 
     if (!res.data) throw new Error("No data in response");
@@ -115,9 +124,15 @@ export const authService = {
 
   /** Reset password with a token */
   async resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<null>> {
+    const { encryptSensitiveField } = await import("@/utils/crypto");
+    const encryptedPassword = await encryptSensitiveField(data.new_password);
+
     return await apiFetch<ApiResponse<null>>("/api/auth/reset-password/", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        new_password: encryptedPassword,
+      }),
     });
   },
 

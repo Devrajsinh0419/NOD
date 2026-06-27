@@ -9,7 +9,7 @@ import type { Project, ProjectCreateData, ProjectUpdateData } from "@/types/proj
 import { PROFESSIONAL_ROLE_LABELS } from "@/types/project.types"
 import StatusBadge from "@/components/ui/StatusBadge"
 import ProjectForm from "@/components/dashboard/ProjectForm"
-import { getMediaUrl } from "@/lib/api"
+import { SecureFileLink } from "@/components/ui/SecureFileLink"
 import EscrowPaymentModal from "@/components/dashboard/EscrowPaymentModal"
 
 export default function ProjectsPage() {
@@ -327,15 +327,13 @@ export default function ProjectsPage() {
                       </div>
                       <div className="flex gap-2">
                         {(Array.isArray(urls) ? urls : [urls]).map((url: string, index) => (
-                          <a
+                          <SecureFileLink
                             key={index}
-                            href={getMediaUrl(url)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2.5 py-1  bg-[#C9A96E]/20 hover:bg-[#C9A96E]/50 rounded text-[10px] text-[#B8A88A] transition-colors"
-                          >
-                            View #{index + 1}
-                          </a>
+                            filePath={url}
+                            label={`View #${index + 1}`}
+                            showIcon={false}
+                            className="px-2.5 py-1 bg-[#C9A96E]/20 hover:bg-[#C9A96E]/50 rounded text-[10px] text-[#B8A88A] transition-colors"
+                          />
                         ))}
                       </div>
                     </div>

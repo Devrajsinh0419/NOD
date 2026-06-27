@@ -5,7 +5,7 @@ import { authService } from "@/services/auth.service"
 import { projectService } from "@/services/project.service"
 import type { Project } from "@/types/project.types"
 import StatusBadge from "@/components/ui/StatusBadge"
-import { getMediaUrl } from "@/lib/api"
+import { SecureFileLink } from "@/components/ui/SecureFileLink"
 import { formatToUserCurrency } from "@/utils/currency"
 
 interface Props {
@@ -274,15 +274,13 @@ export default function ProfessionalProjects({ role }: Props) {
                       <span className="capitalize text-[#B8A88A]">{key.replace(/_/g, " ")}</span>
                       <div className="flex gap-1.5">
                         {(Array.isArray(urls) ? urls : [urls]).map((url: string, index) => (
-                          <a
+                          <SecureFileLink
                             key={index}
-                            href={getMediaUrl(url)}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            filePath={url}
+                            label={`View #${index + 1}`}
+                            showIcon={false}
                             className="px-2.5 py-1 bg-[#C9A96E]/20 hover:bg-[#C9A96E]/50 rounded text-[10px] text-[#B8A88A] transition-colors"
-                          >
-                            View #{index + 1}
-                          </a>
+                          />
                         ))}
                       </div>
                     </div>

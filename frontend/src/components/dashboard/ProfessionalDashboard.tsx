@@ -138,6 +138,11 @@ export default function ProfessionalDashboard({ role }: Props) {
         return
       }
 
+      if (formValues.bio && formValues.bio.length > 150) {
+        setError(`Bio must be at most 150 characters. Currently: ${formValues.bio.length} characters.`)
+        return
+      }
+
       console.log("Saving profile:", formValues, formFiles)
 
       const stored = authService.getStoredUser()
@@ -427,13 +432,23 @@ export default function ProfessionalDashboard({ role }: Props) {
                     </label>
 
                     {field.type === "textarea" && (
-                      <textarea
-                        rows={3}
-                        placeholder={field.placeholder}
-                        value={formValues[field.id] || ""}
-                        onChange={(e) => setValue(field.id, e.target.value)}
-                        className={baseClass}
-                      />
+                      <div>
+                        <textarea
+                          rows={3}
+                          placeholder={field.placeholder}
+                          value={formValues[field.id] || ""}
+                          onChange={(e) => setValue(field.id, e.target.value)}
+                          maxLength={field.id === "bio" ? 150 : undefined}
+                          className={baseClass}
+                        />
+                        {field.id === "bio" && (
+                          <div className="flex justify-between mt-1 text-[10px]">
+                            <span className={(formValues[field.id]?.length || 0) > 150 ? "text-red-400/60" : "text-white/35"}>
+                              Character count: {formValues[field.id]?.length || 0} / 150
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     )}
 
                     {(field.type === "text" || field.type === "number") && field.id !== "gstin" && (

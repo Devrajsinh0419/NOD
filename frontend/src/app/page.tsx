@@ -15,25 +15,43 @@ export const metadata: Metadata = {
 
 // Dynamically import below-the-fold components with SSR enabled
 const FeaturedServices = dynamic(() => import("@/components/landing/featured-services"), {
-  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
 })
 const FeaturedProjects = dynamic(() => import("@/components/landing/featured-projects"), {
-  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
 })
-const AboutSection = dynamic(() => import("@/components/landing/about/index"), {
-  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+const DesignerShowcase = dynamic(() => import("@/components/landing/designer-showcase"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
+})
+const WhyChooseUs = dynamic(() => import("@/components/landing/why-choose-us"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
 })
 const ProcessSection = dynamic(() => import("@/components/landing/process-section"), {
-  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
+})
+const Statistics = dynamic(() => import("@/components/landing/statistics"), {
+  loading: () => <div className="h-48 w-full animate-pulse bg-[#070708]" />
+})
+const AboutSection = dynamic(() => import("@/components/landing/about/index"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
+})
+const Testimonials = dynamic(() => import("@/components/landing/testimonials"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
+})
+const FAQ = dynamic(() => import("@/components/landing/faq"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
 })
 const CTASection = dynamic(() => import("@/components/landing/cta"), {
-  loading: () => <div className="h-96 w-full animate-pulse bg-[#1A1714]" />
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
+})
+const Footer = dynamic(() => import("@/components/landing/footer"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-[#070708]" />
 })
 
 // Client-only component (ChatWidget) dynamically loaded
 const ChatWidget = dynamic(() => import("@/components/chat/ChatWidget"))
 
-export default function Home() {
+export default async function Home() {
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -66,7 +84,7 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-background text-foreground overflow-hidden">
+    <main className="bg-background text-foreground overflow-hidden noise-bg">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
@@ -75,15 +93,51 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
-      <Navbar />
-      <HeroSection />
-      <Marque />
-      <FeaturedServices />
-      <FeaturedProjects />
-      <AboutSection />
-      <ProcessSection />
-      <CTASection />
-      <ChatWidget />
+
+      {/* Background static layers */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-[#C9A96E]/5 to-transparent blur-[100px]" />
+      </div>
+
+      <div className="relative z-10">
+        <Navbar />
+        <HeroSection />
+        <Marque />
+        <div className="content-visibility-auto">
+          <FeaturedServices />
+        </div>
+        <div className="content-visibility-auto">
+          <FeaturedProjects />
+        </div>
+        <div className="content-visibility-auto">
+          <WhyChooseUs />
+        </div>
+        <div className="content-visibility-auto">
+          <ProcessSection />
+        </div>
+        <div className="content-visibility-auto">
+          <DesignerShowcase />
+        </div>
+        <div className="content-visibility-auto">
+          <AboutSection />
+        </div>
+        <div className="content-visibility-auto">
+          <Testimonials />
+        </div>
+        <div className="content-visibility-auto">
+          <Statistics />
+        </div>
+        <div className="content-visibility-auto">
+          <FAQ />
+        </div>
+        <div className="content-visibility-auto">
+          <CTASection />
+        </div>
+        <div className="content-visibility-auto">
+          <Footer />
+        </div>
+        <ChatWidget />
+      </div>
     </main>
   )
 }

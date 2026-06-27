@@ -227,6 +227,7 @@ function LoginContent() {
   const [step, setStep] = useState(1)
   const [username, setUsername] = useState("")
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [googleIdToken, setGoogleIdToken] = useState<string | null>(null)
 
   const [otpSent, setOtpSent] = useState(false)
   const [otpCode, setOtpCode] = useState("")
@@ -301,6 +302,14 @@ function LoginContent() {
     return ""
   }
 
+  const validateNameInput = (val: string) => {
+    if (!val.trim()) return "Full Name is required"
+    if (!/^[a-zA-Z\s.\-']+$/.test(val.trim())) {
+      return "Full Name must contain only letters, spaces, dots, hyphens, and apostrophes"
+    }
+    return ""
+  }
+
   // Forgot Password modal state
   const [showForgotModal, setShowForgotModal] = useState(false)
   const [forgotEmail, setForgotEmail] = useState("")
@@ -358,6 +367,7 @@ function LoginContent() {
   const phoneError = validatePhone(phone, phoneCode)
   const emailError = validateEmail(email)
   const usernameError = username ? validateUsernameInput(username) : null
+  const fullNameError = fullName ? validateNameInput(fullName) : null
   const passwordStatus = validatePassword(password)
   const passwordAllPass = passwordStatus?.checks.every((c) => c.pass) ?? false
 
@@ -368,6 +378,11 @@ function LoginContent() {
     }
     if (!fullName.trim() || !username.trim() || !email.trim() || !password || !phone.trim()) {
       setError("Please fill all required fields")
+      return
+    }
+    const nError = validateNameInput(fullName)
+    if (nError) {
+      setError(nError)
       return
     }
     const uError = validateUsernameInput(username)
@@ -459,6 +474,11 @@ function LoginContent() {
         setError("Please fill all step 1 fields")
         return
       }
+      const nError = validateNameInput(fullName)
+      if (nError) {
+        setError(nError)
+        return
+      }
       const uError = validateUsernameInput(username)
       if (uError) {
         setError(uError)
@@ -499,6 +519,14 @@ function LoginContent() {
         }
       }
 
+      if (roleFields.bio) {
+        const bioLength = roleFields.bio.length
+        if (bioLength > 150) {
+          setError(`Bio must be at most 150 characters. Currently: ${bioLength} characters.`)
+          return
+        }
+      }
+
       if (role === "Contractor") {
         if (!gstinStatus || !gstinStatus.valid) {
           setError("Please enter and verify a valid GSTIN number")
@@ -522,28 +550,48 @@ function LoginContent() {
       if (isSignUp) {
         const [firstName, ...rest] = fullName.trim().split(" ")
         const lastName = rest.join(" ") || ""
-        await authService.register({
-          username,
-          email,
-          first_name: firstName,
-          last_name: lastName,
-          password,
-          phone_number: phone,
-          role: role.toLowerCase(),
-          country,
-          location,
-          currency,
-          ...roleFields,
-        })
-        const nextParam = searchParams.get("next")
-        if (nextParam) {
-          router.push(nextParam)
+        if (googleIdToken) {
+          const res = await authService.loginWithGoogle(googleIdToken, role.toLowerCase(), {
+            username,
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: phone,
+            country,
+            location,
+            currency,
+            ...roleFields,
+          })
+          const nextParam = searchParams.get("next") || searchParams.get("redirect")
+          if (nextParam) {
+            router.push(nextParam)
+          } else {
+            router.push(getDashboardPath(role))
+          }
         } else {
-          router.push(getDashboardPath(role))
+          await authService.register({
+            username,
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            password,
+            phone_number: phone,
+            role: role.toLowerCase(),
+            country,
+            location,
+            currency,
+            ...roleFields,
+          })
+          const nextParam = searchParams.get("next") || searchParams.get("redirect")
+          if (nextParam) {
+            router.push(nextParam)
+          } else {
+            router.push(getDashboardPath(role))
+          }
         }
       } else {
         const user = await authService.login({ email, password })
-        const nextParam = searchParams.get("next")
+        const nextParam = searchParams.get("next") || searchParams.get("redirect")
         if (nextParam) {
           router.push(nextParam)
         } else {
@@ -584,13 +632,26 @@ function LoginContent() {
       const firebaseUser = result.user
       const idToken = await firebaseUser.getIdToken()
 
-      // Login/Register via Django backend using the Firebase ID token
-      const res = await authService.loginWithGoogle(idToken, role || "client")
-      const nextParam = searchParams.get("next")
-      if (nextParam) {
-        router.push(nextParam)
+      if (isSignUp) {
+        setGoogleIdToken(idToken)
+        setFullName(firebaseUser.displayName || "")
+        setEmail(firebaseUser.email || "")
+        if (firebaseUser.email) {
+          setUsername(firebaseUser.email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, ""))
+        }
+        // Auto-generate a valid strong password to bypass front-end validation
+        setPassword("G_" + firebaseUser.uid.substring(0, 10) + "aB1!")
+        setOtpVerified(true)
+        setOtpMessage("Authenticated with Google. Please select your role and fill the registration details.")
       } else {
-        router.push(getDashboardPath(res.user?.role || role || "client"))
+        // Login via Django backend using the Firebase ID token
+        const res = await authService.loginWithGoogle(idToken, role || "client")
+        const nextParam = searchParams.get("next") || searchParams.get("redirect")
+        if (nextParam) {
+          router.push(nextParam)
+        } else {
+          router.push(getDashboardPath(res.user?.role || role || "client"))
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed")
@@ -722,7 +783,7 @@ function LoginContent() {
 
           {/* ── SIGN-IN FORM ── */}
           {!isSignUp && (
-            <div className="space-y-5">
+            <form onSubmit={(e) => e.preventDefault()} autoComplete="off" className="space-y-5">
               <div className="group">
                 <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">Email</label>
                 <input
@@ -731,6 +792,7 @@ function LoginContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@email.com"
                   className={inputClass}
+                  autoComplete="off"
                 />
               </div>
 
@@ -743,6 +805,7 @@ function LoginContent() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                     className={`${inputClass} pr-12`}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -778,12 +841,12 @@ function LoginContent() {
                   </button>
                 </div>
               </div>
-            </div>
+            </form>
           )}
 
           {/* ── SIGN-UP STEP 1 — shared fields ── */}
           {isSignUp && step === 1 && (
-            <div className="space-y-5">
+            <form onSubmit={(e) => e.preventDefault()} autoComplete="off" className="space-y-5">
               <div>
                 <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-3">
                   Select Role
@@ -812,8 +875,14 @@ function LoginContent() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
-                  className={inputClass}
+                  className={`${inputClass} ${fullNameError === "" ? "border-green-500/20" : fullNameError ? "border-red-400/20" : ""}`}
+                  autoComplete="off"
                 />
+                {fullNameError !== null && (
+                  <p className={`mt-1.5 text-[10px] ${fullNameError ? "text-red-400/60" : "text-green-400/50"}`}>
+                    {fullNameError || "Valid name ✓"}
+                  </p>
+                )}
               </div>
 
               <div className="group">
@@ -825,6 +894,7 @@ function LoginContent() {
                   placeholder="johndoe123"
                   className={`${inputClass} ${usernameError === "" ? "border-green-500/20" : usernameError ? "border-red-400/20" : ""}`}
                   required
+                  autoComplete="off"
                 />
                 {usernameError !== null && (
                   <p className={`mt-1.5 text-[10px] ${usernameError ? "text-red-400/60" : "text-green-400/50"}`}>
@@ -849,6 +919,7 @@ function LoginContent() {
                       }
                     }}
                     className="w-110px shrink-0 rounded-xl border border-[#C9A96E]/12 bg-[#C9A96E]/5 px-2 py-3.5 text-sm text-white outline-none transition-all duration-300 focus:border-[#C9A96E]/25 focus:bg-[#C9A96E]/[0.08] hover:border-[#C9A96E]/18 appearance-none cursor-pointer"
+                    autoComplete="off"
                   >
                     {COUNTRY_CODES.map((cc) => (
                       <option key={cc.code} value={cc.code} className="bg-[#1A1714]">
@@ -869,6 +940,7 @@ function LoginContent() {
                     }}
                     placeholder={phoneCode === "+91" || phoneCode === "+1" ? "98765 43210" : "Phone number"}
                     className={`${inputClass} flex-1 ${phoneError === "" ? "border-green-500/20" : phoneError ? "border-red-400/20" : ""}`}
+                    autoComplete="off"
                   />
                 </div>
                 {phoneError !== null && (
@@ -894,6 +966,7 @@ function LoginContent() {
                     disabled={otpVerified}
                     placeholder="name@email.com"
                     className={`${inputClass} flex-1 ${emailError === "" ? "border-green-500/20" : emailError ? "border-red-400/20" : ""} ${otpVerified ? "opacity-60 cursor-not-allowed border-green-500/30" : ""}`}
+                    autoComplete="off"
                   />
                   {!otpVerified && (
                     <button
@@ -928,6 +1001,7 @@ function LoginContent() {
                       onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                       placeholder="6-digit OTP"
                       className={`${inputClass} flex-1`}
+                      autoComplete="one-time-code"
                     />
                     <button
                       type="button"
@@ -969,6 +1043,7 @@ function LoginContent() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min 8 chars, uppercase, digit, special"
                     className={`${inputClass} pr-12 ${passwordAllPass ? "border-green-500/20" : password ? "border-[#C9A96E]/15" : ""}`}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -1014,12 +1089,12 @@ function LoginContent() {
                   <a href="#" className="">Terms and Conditions</a>
                 </label>
               </div>
-            </div>
+            </form>
           )}
 
           {/* ── SIGN-UP STEP 2 — country + role-specific fields ── */}
           {isSignUp && step === 2 && (
-            <div className="space-y-5">
+            <form onSubmit={(e) => e.preventDefault()} autoComplete="off" className="space-y-5">
 
               {/* Step indicator */}
               <div className="flex items-center gap-2 mb-2">
@@ -1046,6 +1121,7 @@ function LoginContent() {
                     setCurrency(code ? countryToCurrency[code] ?? "" : "")
                   }}
                   className={inputClass}
+                  autoComplete="off"
                 >
                   <option value="" className="bg-[#1A1714]">Select Country</option>
                   {countries.map((c) => (
@@ -1063,6 +1139,7 @@ function LoginContent() {
                   readOnly
                   placeholder="Auto-filled from country"
                   className={`${inputClass} cursor-not-allowed opacity-60`}
+                  autoComplete="off"
                 />
               </div>
 
@@ -1099,13 +1176,27 @@ function LoginContent() {
                       </label>
 
                       {field.type === "textarea" && (
-                        <textarea
-                          rows={3}
-                          placeholder={field.placeholder}
-                          value={roleFields[field.id] || ""}
-                          onChange={(e) => setRoleField(field.id, e.target.value)}
-                          className={inputClass}
-                        />
+                        <div>
+                          <textarea
+                            rows={3}
+                            placeholder={field.placeholder}
+                            value={roleFields[field.id] || ""}
+                            onChange={(e) => setRoleField(field.id, e.target.value)}
+                            maxLength={150}
+                            className={`${inputClass} ${field.id === "bio" && (roleFields[field.id]?.length || 0) > 150 ? "border-red-400/30 focus:border-red-400/50" : ""}`}
+                            autoComplete="off"
+                          />
+                          {field.id === "bio" && (
+                            <div className="flex justify-between mt-1.5 text-[10px]">
+                              <span className={(roleFields[field.id]?.length || 0) > 150 ? "text-red-400/60" : "text-white/30"}>
+                                Character count: {roleFields[field.id]?.length || 0} / 150
+                              </span>
+                              {(roleFields[field.id]?.length || 0) > 150 && (
+                                <span className="text-red-400/60 font-medium">Limit exceeded</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       )}
 
                       {(field.type === "text" || field.type === "number") && field.id !== "gstin" && (
@@ -1115,6 +1206,7 @@ function LoginContent() {
                           value={roleFields[field.id] || ""}
                           onChange={(e) => setRoleField(field.id, e.target.value)}
                           className={inputClass}
+                          autoComplete="off"
                         />
                       )}
 
@@ -1134,6 +1226,7 @@ function LoginContent() {
                                   : "border-red-400/30 focus:border-red-400/50"
                                 : ""
                                 }`}
+                              autoComplete="off"
                             />
                             <button
                               type="button"
@@ -1173,6 +1266,7 @@ function LoginContent() {
                             }
                           }}
                           className={inputClass}
+                          autoComplete="off"
                         >
                           <option value="" className="bg-[#1A1714]">Select {field.label}</option>
                           {field.options?.map((opt) => (
@@ -1191,6 +1285,7 @@ function LoginContent() {
                             value={roleFields.tradeOther || ""}
                             onChange={(e) => setRoleField("tradeOther", e.target.value)}
                             className={inputClass}
+                            autoComplete="off"
                           />
                         </div>
                       )}
@@ -1226,6 +1321,7 @@ function LoginContent() {
                                 value={roleFields.licenseNumber || ""}
                                 onChange={(e) => setRoleField("licenseNumber", e.target.value)}
                                 className={inputClass}
+                                autoComplete="off"
                               />
                             </div>
                           )}
@@ -1235,7 +1331,7 @@ function LoginContent() {
                   ))}
                 </>
               )}
-            </div>
+            </form>
           )}
 
           {error && (
@@ -1335,7 +1431,7 @@ function LoginContent() {
             </button>
 
             {!forgotSuccess ? (
-              <form onSubmit={handleForgotSubmit} className="space-y-6">
+              <form onSubmit={handleForgotSubmit} autoComplete="off" className="space-y-6">
                 <div>
                   <h3 className="text-2xl font-light text-[#F5F0F8]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                     Recover Password
@@ -1354,6 +1450,7 @@ function LoginContent() {
                     placeholder="name@email.com"
                     className={inputClass}
                     disabled={forgotLoading}
+                    autoComplete="off"
                   />
                 </div>
 

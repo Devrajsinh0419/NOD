@@ -1,6 +1,7 @@
 import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import { Metadata } from 'next'
+import SessionManager from '@/components/auth/SessionManager'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -80,12 +81,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${inter.variable} ${cormorant.variable} dark`}>
       <head>
         <link rel="preconnect" href="https://nominatim.openstreetmap.org" />
         <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org" />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <SessionManager />
+      </body>
     </html>
   )
 }

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { chatService, Meeting } from "@/services/chat.service"
 import type { ChatRoom, ChatMessage } from "@/types/chat.types"
 import { getMediaUrl } from "@/lib/api"
+import { SecureFileLink } from "@/components/ui/SecureFileLink"
 import { projectService } from "@/services/project.service"
 import EscrowPaymentModal from "@/components/dashboard/EscrowPaymentModal"
 import {
@@ -590,14 +591,11 @@ export default function ChatView({ role }: Props) {
                                     <FileText className="w-4 h-4 shrink-0" />
                                     <span className="truncate text-[10px]">Open Attachment</span>
                                   </div>
-                                  <a
-                                    href={getMediaUrl(msg.attachment)}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                  <SecureFileLink
+                                    filePath={msg.attachment}
                                     className="p-1 rounded bg-white/10 hover:bg-white/20 transition-all shrink-0 text-inherit"
-                                  >
-                                    <Download className="w-3 h-3" />
-                                  </a>
+                                    iconClassName="w-3 h-3"
+                                  />
                                 </div>
                               )}
                             </div>
@@ -818,15 +816,12 @@ export default function ChatView({ role }: Props) {
                             </div>
 
                             {msg.attachment && (
-                              <a
-                                href={getMediaUrl(msg.attachment)}
-                                target="_blank"
-                                rel="noreferrer"
+                              <SecureFileLink
+                                filePath={msg.attachment}
                                 className="p-2 rounded-xl bg-[#C9A96E]/5 hover:bg-[#C9A96E]/15 text-[#C9A96E] border border-[#C9A96E]/20 flex items-center justify-center shrink-0 cursor-pointer"
-                                title="Download File"
-                              >
-                                <Download className="w-4 h-4" />
-                              </a>
+                                iconClassName="w-4 h-4"
+                                label="Download File"
+                              />
                             )}
                           </div>
                         )

@@ -123,7 +123,7 @@ function ResetPasswordContent() {
         )}
 
         {token && !success && (
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} autoComplete="off" className="space-y-5">
             {/* New Password */}
             <div className="group">
               <label className="block text-[10px] uppercase tracking-[0.3em] text-[#F5F0F8] mb-2">New Password</label>
@@ -135,6 +135,7 @@ function ResetPasswordContent() {
                   placeholder="Enter new password"
                   className={`${inputClass} pr-12`}
                   disabled={loading}
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -179,6 +180,7 @@ function ResetPasswordContent() {
                 placeholder="Confirm new password"
                 className={inputClass}
                 disabled={loading}
+                autoComplete="new-password"
               />
               {confirmPassword && (
                 <p className={`mt-2 text-[10px] flex items-center gap-1.5 ${matchPass ? "text-green-400/60" : "text-red-400/60"}`}>
