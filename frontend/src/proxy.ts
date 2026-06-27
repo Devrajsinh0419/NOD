@@ -1,12 +1,29 @@
-console.log("NODE_ENV:", process.env.NODE_ENV);
+import { auth0 } from "./lib/auth0";
 
-console.log("AUTH0_DOMAIN exists?", !!process.env.AUTH0_DOMAIN);
-console.log("AUTH0_CLIENT_ID exists?", !!process.env.AUTH0_CLIENT_ID);
-console.log("AUTH0_SECRET exists?", !!process.env.AUTH0_SECRET);
-console.log("AUTH0_CLIENT_SECRET exists?", !!process.env.AUTH0_CLIENT_SECRET);
-console.log("APP_BASE_URL exists?", !!process.env.APP_BASE_URL);
+export async function proxy(request: Request) {
+  console.log("PROXY URL:", request.url);
+  console.log("AUTH0_DOMAIN:", process.env.AUTH0_DOMAIN);
+  console.log("APP_BASE_URL:", process.env.APP_BASE_URL);
+  console.log("AUTH0_CLIENT_ID:", process.env.AUTH0_CLIENT_ID);
 
-console.log("All AUTH0 env keys:");
-console.log(
-  Object.keys(process.env).filter(key => key.includes("AUTH0"))
-);
+  const authResponse = await auth0.middleware(request);
+  console.log("authResponse exists?", !!authResponse);
+  if (authResponse) {
+    console.log("authResponse status:", authResponse.status);
+    console.log("authResponse headers x-middleware-next:", authResponse.headers.get("x-middleware-next"));
+    console.log("authResponse headers location:", authResponse.headers.get("location"));
+  }
+
+  // Always return the auth response.
+  //
+  // Note: The auth response forwards requests to your app routes by default.
+  // If you need to block requests, do it before calling auth0.middleware() or
+  // copy the authResponse headers except for x-middleware-next to your blocking response.
+  return authResponse;
+}
+
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+  ],
+};
