@@ -239,6 +239,29 @@ const downloadSecureFile = async (filePath: string): Promise<void> => {
   window.URL.revokeObjectURL(url);
 };
 
-export { apiFetch, API_BASE, getMediaUrl, isPrivateFileUrl, downloadSecureFile };
+const fetchSecureFile = async (filePath: string, inline: boolean = false): Promise<Blob> => {
+  const match = filePath.match(/([a-f0-9\-]{36})/i);
+  if (!match) {
+    throw new Error("Invalid file path format: no UUID found.");
+  }
+  const uuid = match[1];
+  const token = typeof window !== "undefined" ? localStorage.getItem("nod_token") : null;
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const url = `${API_BASE}/api/files/${uuid}/download${inline ? "?inline=1" : ""}`;
+  const response = await fetch(url, { headers });
+
+  if (!response.ok) {
+    throw new Error(`Fetch failed with status ${response.status}`);
+  }
+
+  return response.blob();
+};
+
+export { apiFetch, API_BASE, getMediaUrl, isPrivateFileUrl, downloadSecureFile, fetchSecureFile };
+
 
 
