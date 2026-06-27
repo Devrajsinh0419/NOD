@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Star, MapPin, CheckCircle2, DollarSign, Calendar, ArrowRight } from "lucide-react"
+import { Star, MapPin, CheckCircle2, IndianRupee, Calendar, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function DesignerShowcase() {
@@ -13,7 +13,7 @@ export default function DesignerShowcase() {
       location: "Hydrabad",
       rating: "4.9",
       projects: "10 Completed",
-      rate: "₹600/hr",
+      rate: "600/hr",
       cover: "/images/interior.webp",
       avatar: "/images/founder.webp",
       badge: "Featured Expert",
@@ -24,7 +24,7 @@ export default function DesignerShowcase() {
       location: "Delhi",
       rating: "4.85",
       projects: "10 Completed",
-      rate: "₹700/hr",
+      rate: "700/hr",
       cover: "/images/exterior.webp",
       avatar: "/images/founder.webp",
       badge: "Featured Studio",
@@ -35,7 +35,7 @@ export default function DesignerShowcase() {
       location: "Madhya Pradesh",
       rating: "4.95",
       projects: "10 Completed",
-      rate: "₹500/hr",
+      rate: "500/hr",
       cover: "/images/civil.webp",
       avatar: "/images/founder.webp",
       badge: "Top Contractor",
@@ -142,7 +142,7 @@ export default function DesignerShowcase() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <DollarSign size={13} className="text-warm-gold/75 shrink-0" />
+                    <IndianRupee size={13} className="text-warm-gold/75 shrink-0" />
                     <span className="text-xs text-ivory font-semibold">{designer.rate}</span>
                   </div>
 
